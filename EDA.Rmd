@@ -1,0 +1,184 @@
+---
+title: "01 Ingest"
+author: "Ross McCullough"
+date: "15/02/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r cars}
+library(tidyverse)
+library(lubridate)
+library(leaflet)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+df <- read.csv('./data/dft-road-casualty-statistics-accident-2020.csv.xls')
+
+
+high_crash_severity <- c(1,2)
+
+df<-
+  df %>%
+  mutate(accident_severity = replace(accident_severity,accident_severity ==3 ,0))%>%
+  mutate(accident_severity = replace(accident_severity,accident_severity %in% high_crash_severity ,1))%>%
+  filter(speed_limit != -1)
+
+
+df <-
+  df%>%
+  mutate(date = as.Date(date, "%d/%m/%y"))%>%
+  mutate(time = hm(time))%>%
+  mutate(hour =hour(time))%>%
+  mutate(month = month(date))%>%
+  mutate(night = case_when(hour < 6 | hour >= 23  ~ 1, TRUE~0 ))%>%
+  mutate(weekend = case_when(hour >= 18 & day_of_week %in% c(6,7)~ 1, TRUE~0 ))%>%
+  mutate(season = case_when(
+    month %in% c(1,2,12) ~ 'winter',
+    month %in% c(3,4,5) ~ 'spring',
+    month %in% c(6,7,8) ~ 'summer',
+    month %in% c(9,10,11)~'autumn'
+  ))%>%
+  mutate(season = factor(season, levels = c('winter', 'spring', 'summer', 'autumn')))
+
+
+```
+
+```{r}
+df %>%
+  group_by(speed_limit)%>%
+  summarise(proportion_severe = mean(accident_severity))
+```
+
+```{r}
+date_df <-
+  df%>%
+  group_by(date)%>%
+  summarise(proportion_severe = mean(accident_severity))
+
+ggplot(date_df, aes(x=date, y=proportion_severe ))+
+  geom_point()+
+  geom_smooth()+
+  annotate('rect',xmin=as.Date("2020-03-23"),xmax=as.Date("2020-06-15"),ymin=0.1,ymax=Inf, fill='red', alpha=0.25) #Start of lockdown
+ # geom_vline(xintercept=as.Date("2020-06-15")) #Non Essential shops reopen
+```
+
+```{r}
+#No immediately clear winter effect by quarter/month
+time_df<-
+  df%>%
+  mutate(hour = hour(time))%>%
+  mutate(month = month(date))%>%
+  group_by(hour, month)%>%
+  summarise(accident_proportion = mean(accident_severity))
+
+ggplot(time_df, aes(x=hour, y=accident_proportion))+
+  geom_point()+
+  geom_smooth()
+```
+
+```{r}
+#No immediately clear winter effect by quarter/month
+time_df<-
+  df%>%
+  mutate(hour = hour(time))%>%
+  mutate(day =week(date))%>%
+  group_by(hour, day)%>%
+  summarise(accident_proportion = mean(accident_severity))
+
+ggplot(time_df, aes(x=hour, y=accident_proportion, group=day))+
+  geom_line()
+```
+
+```{r}
+lsoa_df <-
+  read.csv('./data/LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Lookup_for_England_and_Wales.csv')
+
+
+lad_prop_df<-
+  df %>%
+  merge(.,lsoa_df, by.x="lsoa_of_accident_location", by.y="LSOA21CD")%>%
+  group_by(LAD22CD)%>%
+  summarise(accident_proportion = mean(accident_severity))
+
+
+uk_regions <- geojsonio::geojson_read("https://martinjc.github.io/UK-GeoJSON/json/eng/topo_lad.json", what = "sp")
+
+uk_regions <- uk_regions[uk_regions$id %in% lad_prop_df$LAD22CD, ]
+
+bins <-c(0,0.1,0.2,0.3,0.4,0.5,0.6)
+pal <- colorBin("Reds", domain = lad_prop_df$accident_proportion, bins=bins )
+
+leaflet(uk_regions)%>%
+  addTiles('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}') %>%
+  addPolygons(stroke = FALSE, smoothFactor = 0.3,opacity = 1,fillOpacity = 0.7,dashArray = "3",
+    fillColor = ~pal(lad_prop_df$accident_proportion),)%>%
+  addLegend(pal = pal, values = lad_prop_df$accident_proportion, opacity = 0.7, title = NULL,
+  position = "bottomright")
+```
+
+```{r}
+mdl <- glm(accident_severity ~ speed_limit +night+weekend+season,data = df, family = binomial())
+
+summary(mdl)
+```
+```{r}
+
+speeds <- seq(0,100,1)
+n_samples <- length(speeds)
+
+newdata = list(
+  speed_limit=speeds, 
+  night=rep(0,n_samples), 
+  weekend=rep(0,n_samples),
+  season = rep('winter',n_samples))
+
+predicted_vals <- predict(mdl,type = "response", newdata= newdata, se.fit=TRUE)
+                                                                                    
+results <-
+  tibble(
+    speeds =speeds,
+    mu = predicted_vals$fit, 
+    upper_ci =  predicted_vals$fit +1.96*predicted_vals$se.fit,
+    lower_ci =  predicted_vals$fit -1.96*predicted_vals$se.fit
+)                                                                                    
+results
+
+#plot( seq(-0,70,1),predict(mdl,type = "response", newdata = list(speed_limit=seq(-0,70,1), night=rep(0,length(seq(0,70,1))))))
+```
+
+```{r}
+vehicle_df <-
+  read_csv('./data/dft-road-casualty-statistics-vehicle-2020.csv.xls')
+
+vehicle_df <-
+  merge(vehicle_df,df, by="accident_index")
+
+sun_in_eyes <-
+  vehicle_df%>%
+  filter(vehicle_direction_from == 7|vehicle_direction_from == 3)%>%
+  mutate(month=month(date))%>%
+  mutate(hour=hour(time))%>%
+  filter(hour>6)%>%
+  group_by(month, hour)%>%
+  summarise(accident_proportion = mean(accident_severity))
+
+ggplot(sun_in_eyes, aes(hour, accident_proportion, color=month))+
+  geom_point()
+
+```
+
+```{r}
+df <-
+  read_csv('./data/dft-road-casualty-statistics-casualty-2020.csv.xls')
+```
+
