@@ -76,14 +76,11 @@ ggplot(date_df, aes(x=date, y=proportion_severe ))+
 #No immediately clear winter effect by quarter/month
 time_df<-
   df%>%
-  mutate(hour = hour(time))%>%
-  mutate(month = month(date))%>%
-  group_by(hour, month)%>%
-  summarise(accident_proportion = mean(accident_severity))
+  mutate(hour = minute(time)*hour(time))%>%
+  mutate(week = days(date))
 
-ggplot(time_df, aes(x=hour, y=accident_proportion))+
-  geom_point()+
-  geom_smooth()
+ggplot(time_df, aes(x=hour, y =week))+
+   geom_hex()
 ```
 
 ```{r}
@@ -150,8 +147,29 @@ results <-
     mu = predicted_vals$fit, 
     upper_ci =  predicted_vals$fit +1.96*predicted_vals$se.fit,
     lower_ci =  predicted_vals$fit -1.96*predicted_vals$se.fit
-)                                                                                    
-results
+)
+
+newdata_summer = list(
+  speed_limit=speeds, 
+  night=rep(0,n_samples), 
+  weekend=rep(0,n_samples),
+  season = rep('summer',n_samples))
+
+predicted_vals <- predict(mdl,type = "response", newdata= newdata_summer, se.fit=TRUE)
+                                                                                    
+results_summer <-
+  tibble(
+    speeds =speeds,
+    mu = predicted_vals$fit, 
+    upper_ci =  predicted_vals$fit +1.96*predicted_vals$se.fit,
+    lower_ci =  predicted_vals$fit -1.96*predicted_vals$se.fit
+)
+
+ggplot(data=results, aes(x=speeds, y=mu))+
+  geom_line()+
+  geom_line(data=results_summer)+
+  geom_ribbon(data=results_summer,aes(ymin=lower_ci, ymax=upper_ci), fill='red', alpha=0.5)+
+  geom_ribbon(aes(ymin=lower_ci, ymax=upper_ci), fill='red', alpha=0.5)
 
 #plot( seq(-0,70,1),predict(mdl,type = "response", newdata = list(speed_limit=seq(-0,70,1), night=rep(0,length(seq(0,70,1))))))
 ```

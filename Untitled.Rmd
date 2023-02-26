@@ -1,0 +1,101 @@
+---
+title: "MaleU25"
+author: "Ross McCullough"
+date: "22/02/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r cars}
+library(tidyverse)
+library(lubridate)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+accident_df <- read.csv('./data/dft-road-casualty-statistics-accident-2020.csv.xls')
+
+
+high_crash_severity <- c(1,2)
+
+accident_df<-
+  accident_df %>%
+  mutate(accident_severity = replace(accident_severity,accident_severity ==3 ,0))%>%
+  mutate(accident_severity = replace(accident_severity,accident_severity %in% high_crash_severity ,1))%>%
+  filter(speed_limit != -1)%>%
+  select(accident_index,speed_limit, accident_severity)
+
+head(accident_df,10)
+```
+
+
+```{r}
+vehicle_df <- 
+  read.csv('./data/dft-road-casualty-statistics-vehicle-2020.csv.xls')
+
+vehicle_df<-
+  vehicle_df%>%
+  select(accident_index, age_of_driver, sex_of_driver)%>%
+  filter(sex_of_driver != -1) %>%
+  filter(age_of_driver!= -1)%>%
+  mutate(male_u25 = case_when(age_of_driver <=25 & sex_of_driver==1 ~ 1, TRUE~0))%>%
+  group_by(accident_index)%>%
+  summarise(male_u25 = max(male_u25))
+
+df <- merge(vehicle_df, accident_df, by="accident_index")
+
+mdl <- glm(accident_severity ~ male_u25 + speed_limit, data = df, family = binomial())
+
+summary(mdl)
+```
+
+```{r}
+
+speeds <- seq(0,100,1)
+n_samples <- length(speeds)
+
+newdata = list(
+  speed_limit=speeds, 
+  male_u25=rep(0,n_samples))
+
+predicted_vals <- predict(mdl,type = "response", newdata= newdata, se.fit=TRUE)
+                                                                                    
+results <-
+  tibble(
+    speeds =speeds,
+    mu = predicted_vals$fit, 
+    upper_ci =  predicted_vals$fit +1.96*predicted_vals$se.fit,
+    lower_ci =  predicted_vals$fit -1.96*predicted_vals$se.fit
+)
+
+newdata_male = list(
+  speed_limit=speeds, 
+  male_u25=rep(1,n_samples))
+
+predicted_vals <- predict(mdl,type = "response", newdata= newdata_male, se.fit=TRUE)
+                                                                                    
+results_male <-
+  tibble(
+    speeds =speeds,
+    mu = predicted_vals$fit, 
+    upper_ci =  predicted_vals$fit +1.96*predicted_vals$se.fit,
+    lower_ci =  predicted_vals$fit -1.96*predicted_vals$se.fit
+)
+
+ggplot(data=results, aes(x=speeds, y=mu))+
+  geom_line()+
+  # geom_line()+
+   geom_line(data=results_male)+
+   geom_ribbon(data=results_male,aes(ymin=lower_ci, ymax=upper_ci), fill='red', alpha=0.25)+
+   geom_ribbon(aes(ymin=lower_ci, ymax=upper_ci), fill='red', alpha=0.25)
+
+#plot( seq(-0,70,1),predict(mdl,type = "response", newdata = list(speed_limit=seq(-0,70,1), night=rep(0,length(seq(0,70,1))))))
+```
