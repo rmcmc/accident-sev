@@ -1,205 +1,71 @@
 ---
-title: "01 Ingest"
-author: "Ross McCullough"
-date: "15/02/2023"
-output: html_document
+title: An investigation of the relationship between speed limit and various demographic,
+  environmental and spatial factors on road accident severity in Great Britain
+author: "Group 9"
+date: "27/02/2023"
+output:
+  html_document: default
+  pdf_document: default
+keywords: Accident Severity, Speed Limit, Great Britain, Road, Demographic, Environmental,
+  Spatial
+  
+bibliography: references.bib
+csl: ieee.csl
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Introduction
 
-```{r cars}
-library(tidyverse)
-library(lubridate)
-library(leaflet)
-```
+According to the World Health Organisation, there are approximately 1.3 million fatalities globally each year due to road traffic accidents @who. Indeed, road traffic injuries are the primary cause of death for those aged between five and 29 years old @who. Vulnerable road users such as pedestrians, cyclists and motorcyclists account for over half of all road traffic accident fatalities globally @who. Although most deaths occur in low- to middle-income countries, it is nevertheless an issue of significant concern for high-income countries also.  
 
-## Including Plots
+It is well-documented that driving at an increased speed is related to both the risk of a road traffic accident and the severity of the accident, should it occur. It is reported that for every 1% increase in speed, there is a corresponding 3% increase in risk of serious crashes and 4% increase in the risk of fatal crashes. @who Other risk factors for accident severity include demographic factors; approximately three quarters (73%) of all road traffic fatalities involve males under 25 years old @who. In addition, it can be hypothesised that variables such as the time of day that the accident occurred, the condition of the road surface where the accident occurred e.g. the presence of ice which could lead to skidding or water which could result in a longer stoppage time, and the location of the accident in terms of whether it occurred close to a junction or not, could also contribute to the severity of a road traffic accident. 
 
-You can also embed plots, for example:
+An increased understanding of the impact of these factors on road accident severity could aid policymakers in decision making and be used to inform awareness campaigns aimed to promote safe driving practices. A clearer understanding of the impact of contributing factors to increased road accident severity could result in the introduction of more targeted preventative measures and a more optimal use of finite resources, aimed at increasing road safety.
 
-```{r pressure, echo=FALSE}
-df <- read.csv('./data/dft-road-casualty-statistics-accident-2020.csv.xls')
+The primary aim of this analysis is to determine the relationship between severity of road traffic accidents in Great Britain and the speed limit in place where the accident occurred. Secondary aims include investigating the effects of environmental, spatial and demographic factors on road accident severity. More specifically, the relationship between accident severity and road surface conditions, time of day, casualty type (e.g. pedestrian, cyclist, car occupant), junction location and involvement of males under 25 years old, will be explored as secondary aims.
 
+Information on the data source and methods used to analyse the data will be provided in the subsequent Methods section. The Results section will present the main findings, including figures and tables. The Conclusions and Discussion section will elaborate on the findings and discuss the limitations of the analysis. 
 
-high_crash_severity <- c(1,2)
+## Methods
 
-df<-
-  df %>%
-  mutate(accident_severity = replace(accident_severity,accident_severity ==3 ,0))%>%
-  mutate(accident_severity = replace(accident_severity,accident_severity %in% high_crash_severity ,1))%>%
-  filter(speed_limit != -1)
+### Data Sources
+
+This retrospective analysis utilised road safety data for the year 2020, which is available online from the UK’s Department of Transport @data_source. The data which is published provides details of road accidents which occurred on public roads in Great Britain, involved at least one vehicle and which resulted in human injury. Information is available on the circumstances of the accident, such as weather conditions, time of day, visibility, speed limit, road type and surface conditions. In addition, data is available on the types of vehicles and characteristics of the casualties involved. 
+
+The outcome variable selected for this analysis was road accident severity. The available data reports accident severity as fatal, serious or slight. For this analysis, the fatal and serious groups were combined, so that accidents were sub-divided into two categories: ‘fatal or serious’ and ‘slight’. In addition, a subset of the other available variables were extracted from the data for analysis, based on their likelihood to impact accident severity. An overview of the selected variables and how they were coded for analysis is provided in the Appendix, Table 1.
 
 
-df <-
-  df%>%
-  mutate(date = as.Date(date, "%d/%m/%y"))%>%
-  mutate(time = hm(time))%>%
-  mutate(hour =hour(time))%>%
-  mutate(month = month(date))%>%
-  mutate(night = case_when(hour < 6 | hour >= 23  ~ 1, TRUE~0 ))%>%
-  mutate(weekend = case_when(hour >= 18 & day_of_week %in% c(6,7)~ 1, TRUE~0 ))%>%
-  mutate(season = case_when(
-    month %in% c(1,2,12) ~ 'winter',
-    month %in% c(3,4,5) ~ 'spring',
-    month %in% c(6,7,8) ~ 'summer',
-    month %in% c(9,10,11)~'autumn'
-  ))%>%
-  mutate(season = factor(season, levels = c('winter', 'spring', 'summer', 'autumn')))
+### Selection of variables
 
+There are too many variables included in the data sets to use all of them so a selection of variables were selected. These variables were selected to show a wide range of factors that could impact on accident severity. 
 
-```
+- Speed limit (accidents data): The relationship between speed limit and accident severity  is the main focus of the study. Speed limit can be considered as a categorical variable as there is only a set number of speed limit options. However, it is impossible to tell from the data whether a vehicle is travel ling at, above or below the speed limit. Thus, the speed limit will be considered as a continuous, quantitative variable.  Moreover, this will allow increased flexibility when predicting accident severity at different speeds.
+- Road surface conditions (accidents data): This is often considered to be a key factor in accidents and it is vital to consider if this impacts on accident severity. The original data set had seven categories. However, five of these categories contained only a total of 2.4% of all accidents. It was therefore considered to be reasonable to reduce this to two variables. These were dry and wet/damp which contain 68.7% and 28.8%, respectively, of all accidents.
+- Time of day (accidents data): time of day was considered important to include as it allows for the impact of the tiredness of the driver to be included in the model, as well as other associated driving issues such as drunk drivers. The original data records the actual time of each accident. This was reduced to the subcategories of night off peak (7pm-7am), morning peak (7am-10am), day off peak (10am-4pm) and evening peak (4pm-7pm). There was a fairly even split of accidents between each category: 24.9%, 14.2%, 37% and 23.9% respectively. There was no data missing for this variable.
+- Casualty type (casualty data sheet):
+- Age and gender of driver (vehicle data sheet):
+- Proximity to a junction (vehicle data sheet):
+- treatment of NAs and unknowns.
 
-```{r}
-df %>%
-  group_by(speed_limit)%>%
-  summarise(proportion_severe = mean(accident_severity))
-```
+### Data analysis
 
-```{r}
-date_df <-
-  df%>%
-  group_by(date)%>%
-  summarise(proportion_severe = mean(accident_severity))
+- Some explanatory data analysis was conducted to see if these variables did in fact play a role in affecting accident severity. 
+- Contingency tables
+- Box plots were constructed to show if there are any interaction effects between the speed limit and other variables.
+- GLM 
 
-ggplot(date_df, aes(x=date, y=proportion_severe ))+
-  geom_point()+
-  geom_smooth()+
-  annotate('rect',xmin=as.Date("2020-03-23"),xmax=as.Date("2020-06-15"),ymin=0.1,ymax=Inf, fill='red', alpha=0.25) #Start of lockdown
- # geom_vline(xintercept=as.Date("2020-06-15")) #Non Essential shops reopen
-```
+## Results
 
-```{r}
-#No immediately clear winter effect by quarter/month
-time_df<-
-  df%>%
-  mutate(hour = hour(time))%>%
-  mutate(month = month(date))%>%
-  group_by(hour, month)%>%
-  summarise(accident_proportion = mean(accident_severity))
+plot 1 details 
 
-ggplot(time_df, aes(x=hour, y=accident_proportion))+
-  geom_point()+
-  geom_smooth()
-```
+![img1](./static/unnamed.png)
 
-```{r}
-#No immediately clear winter effect by quarter/month
-time_df<-
-  df%>%
-  mutate(hour = hour(time))%>%
-  mutate(day =week(date))%>%
-  group_by(hour, day)%>%
-  summarise(accident_proportion = mean(accident_severity))
+plot 2 details
 
-ggplot(time_df, aes(x=hour, y=accident_proportion, group=day))+
-  geom_line()
-```
+![img1](./static/unnamed-2.png)
 
-```{r}
-lsoa_df <-
-  read.csv('./data/LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Lookup_for_England_and_Wales.csv')
-
-
-lad_prop_df<-
-  df %>%
-  merge(.,lsoa_df, by.x="lsoa_of_accident_location", by.y="LSOA21CD")%>%
-  group_by(LAD22CD)%>%
-  summarise(accident_proportion = mean(accident_severity))
-
-
-uk_regions <- geojsonio::geojson_read("https://martinjc.github.io/UK-GeoJSON/json/eng/topo_lad.json", what = "sp")
-
-uk_regions <- uk_regions[uk_regions$id %in% lad_prop_df$LAD22CD, ]
-
-bins <-c(0,0.1,0.2,0.3,0.4,0.5,0.6)
-pal <- colorBin("Reds", domain = lad_prop_df$accident_proportion, bins=bins )
-
-leaflet(uk_regions)%>%
-  addTiles('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}') %>%
-  addPolygons(stroke = FALSE, smoothFactor = 0.3,opacity = 1,fillOpacity = 0.7,dashArray = "3",
-    fillColor = ~pal(lad_prop_df$accident_proportion),)%>%
-  addLegend(pal = pal, values = lad_prop_df$accident_proportion, opacity = 0.7, title = NULL,
-  position = "bottomright")
-```
-
-```{r}
-mdl <- glm(accident_severity ~ speed_limit +night+weekend+season,data = df, family = binomial())
-
-summary(mdl)
-```
-```{r}
-
-speeds <- seq(0,100,1)
-n_samples <- length(speeds)
-
-newdata = list(
-  speed_limit=speeds, 
-  night=rep(0,n_samples), 
-  weekend=rep(0,n_samples),
-  season = rep('winter',n_samples))
-
-predicted_vals <- predict(mdl,type = "response", newdata= newdata, se.fit=TRUE)
-                                                                                    
-results <-
-  tibble(
-    speeds =speeds,
-    mu = predicted_vals$fit, 
-    upper_ci =  predicted_vals$fit +1.96*predicted_vals$se.fit,
-    lower_ci =  predicted_vals$fit -1.96*predicted_vals$se.fit
-)
-
-newdata_summer = list(
-  speed_limit=speeds, 
-  night=rep(0,n_samples), 
-  weekend=rep(0,n_samples),
-  season = rep('summer',n_samples))
-
-predicted_vals <- predict(mdl,type = "response", newdata= newdata_summer, se.fit=TRUE)
-                                                                                    
-results_summer <-
-  tibble(
-    speeds =speeds,
-    mu = predicted_vals$fit, 
-    upper_ci =  predicted_vals$fit +1.96*predicted_vals$se.fit,
-    lower_ci =  predicted_vals$fit -1.96*predicted_vals$se.fit
-)
-
-ggplot(data=results, aes(x=speeds, y=mu))+
-  geom_line()+
-  geom_line(data=results_summer)+
-  geom_ribbon(data=results_summer,aes(ymin=lower_ci, ymax=upper_ci), fill='red', alpha=0.5)+
-  geom_ribbon(aes(ymin=lower_ci, ymax=upper_ci), fill='red', alpha=0.5)
-
-#plot( seq(-0,70,1),predict(mdl,type = "response", newdata = list(speed_limit=seq(-0,70,1), night=rep(0,length(seq(0,70,1))))))
-```
-
-```{r}
-vehicle_df <-
-  read_csv('./data/dft-road-casualty-statistics-vehicle-2020.csv.xls')
-
-vehicle_df <-
-  merge(vehicle_df,df, by="accident_index")
-
-sun_in_eyes <-
-  vehicle_df%>%
-  filter(vehicle_direction_from == 7|vehicle_direction_from == 3)%>%
-  mutate(month=month(date))%>%
-  mutate(hour=hour(time))%>%
-  filter(hour>6)%>%
-  group_by(month, hour)%>%
-  summarise(accident_proportion = mean(accident_severity))
-
-ggplot(sun_in_eyes, aes(hour, accident_proportion, color=month))+
-  geom_point()
-
-```
-
-```{r}
-df <-
-  read_csv('./data/dft-road-casualty-statistics-casualty-2020.csv.xls')
-```
+## References 
 
