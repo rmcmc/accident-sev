@@ -4,8 +4,8 @@ title: An investigation of the relationship between speed limit and various demo
 author: "Group 9"
 date: "27/02/2023"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 keywords: Accident Severity, Speed Limit, Great Britain, Road, Demographic, Environmental,
   Spatial
   

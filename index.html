@@ -242,7 +242,13 @@ pre code {
 </div>
 <div id="regression-model" class="section level3">
 <h3>Regression Model</h3>
-<p>In this analysis we use a specific type of regression analysis for binary outcomes called a logistoc regression.</p>
+<p>In this analysis we use a specific type of regression analysis for binary outcomes called a logistic regression.</p>
+<p>In addition we have included more than one variable, creating a multiple regression. This allows us to “control” for variables.</p>
+<ul>
+<li>Provide better explanation as to what a logistic and multiple regression is and why it is appropriate</li>
+<li>Explain in semi-lay terms how to interpret the results/coefficents (possibly exponentiate for odds?)</li>
+<li>Discuss the “significance”</li>
+</ul>
 <pre><code>## 
 ## Call:
 ## glm(formula = accident_severity ~ speed_limit + factor(road_surface_conditions) + 
