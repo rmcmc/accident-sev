@@ -29,11 +29,12 @@ The primary aim of this analysis is to determine the relationship between severi
 
 Information on the data source and methods used to analyse the data will be provided in the subsequent Methods section. The Results section will present the main findings, including figures and tables. The Conclusions and Discussion section will elaborate on the findings and discuss the limitations of the analysis. 
 
+
 ## Methods
 
 ### Data Sources
 
-This retrospective analysis utilised road safety data for the year 2020, which is available online from the UK’s Department of Transport @data_source. The data which is published provides details of road accidents which occurred on public roads in Great Britain, involved at least one vehicle and which resulted in human injury. Information is available on the circumstances of the accident, such as weather conditions, time of day, visibility, speed limit, road type and surface conditions. In addition, data is available on the types of vehicles and characteristics of the casualties involved. 
+This retrospective analysis utilised road safety data for the year 2020, which is available online from the UK’s Department of Transport @gov. The data which is published provides details of road accidents which occurred on public roads in Great Britain, involved at least one vehicle and which resulted in human injury. Information is available on the circumstances of the accident, such as weather conditions, time of day, visibility, speed limit, road type and surface conditions. In addition, data is available on the types of vehicles and characteristics of the casualties involved. 
 
 The outcome variable selected for this analysis was road accident severity. The available data reports accident severity as fatal, serious or slight. For this analysis, the fatal and serious groups were combined, so that accidents were sub-divided into two categories: ‘fatal or serious’ and ‘slight’. In addition, a subset of the other available variables were extracted from the data for analysis, based on their likelihood to impact accident severity. An overview of the selected variables and how they were coded for analysis is provided in the Appendix, Table 1.
 
@@ -42,30 +43,33 @@ The outcome variable selected for this analysis was road accident severity. The 
 
 There are too many variables included in the data sets to use all of them so a selection of variables were selected. These variables were selected to show a wide range of factors that could impact on accident severity. 
 
-- Speed limit (accidents data): The relationship between speed limit and accident severity  is the main focus of the study. Speed limit can be considered as a categorical variable as there is only a set number of speed limit options. However, it is impossible to tell from the data whether a vehicle is travel ling at, above or below the speed limit. Thus, the speed limit will be considered as a continuous, quantitative variable.  Moreover, this will allow increased flexibility when predicting accident severity at different speeds.
+- Speed limit (accidents data): The relationship between speed limit and accident severity  is the main focus of the study. Speed limit can be considered as a categorical variable as there is only a set number of speed limit options. However, it is impossible to tell from the data whether a vehicle is travelling at, above or below the speed limit. Thus, the speed limit will be considered as a continuous, quantitative variable.  Moreover, this will allow increased flexibility when predicting accident severity at different speeds.
 - Road surface conditions (accidents data): This is often considered to be a key factor in accidents and it is vital to consider if this impacts on accident severity. The original data set had seven categories. However, five of these categories contained only a total of 2.4% of all accidents. It was therefore considered to be reasonable to reduce this to two variables. These were dry and wet/damp which contain 68.7% and 28.8%, respectively, of all accidents.
 - Time of day (accidents data): time of day was considered important to include as it allows for the impact of the tiredness of the driver to be included in the model, as well as other associated driving issues such as drunk drivers. The original data records the actual time of each accident. This was reduced to the subcategories of night off peak (7pm-7am), morning peak (7am-10am), day off peak (10am-4pm) and evening peak (4pm-7pm). There was a fairly even split of accidents between each category: 24.9%, 14.2%, 37% and 23.9% respectively. There was no data missing for this variable.
-- Casualty type (casualty data sheet):
-- Age and gender of driver (vehicle data sheet):
-- Proximity to a junction (vehicle data sheet):
-- treatment of NAs and unknowns.
+- Casualty type (casualty data sheet): The type of casualty was considered to be an interesting variable. The raw data contains many types of casualty which has been collapsed to car occupant (55.5%), cyclist (14.1%), motorcyclist (11.4%) , pedestrian (12.8%) and all other vehicles (6.2%). Although some groups contain more than others, each group contains enough entries to justify their inclusion in the analysis.
+- Age and gender of driver (vehicle data sheet): Young, male drivers are often cited as causing the highest number of accidents. It was therefore considered vital to examine the impact that these drivers have on accident severity. As accidents often involve multiple drivers it is difficult to analyse their impact. In each accident the age of the youngest driver was recorded, and it was possible to isolate all accidents that contained a driver who was male and under 25 years old. Thus allowing the impact of the driver’s age on accident severity to be assessed. 
+-Proximity to a junction (vehicle data sheet): The proximity to a junction could impact the severity of an accident. The raw data contained many categories which were collapsed into two categories. These are “at a junction/roundabout” or “not at a junction/roundabout”.  Each category contains …% and …% of results.
+- There were some entries that have recordings of” not available” or “unknown”. These were only a very small proportion of the data so it was considered valid to discount these from our analysis.
 
 ### Data analysis
 
-- Some explanatory data analysis was conducted to see if these variables did in fact play a role in affecting accident severity. 
-- Contingency tables
-- Box plots were constructed to show if there are any interaction effects between the speed limit and other variables.
-- GLM 
+#### Checking tyhe Variable Selection
 
-## Results
+After having selected the initial variables that were thought of having an impact on accident severity some exploratory data analysis was conducted to see if this was in fact the case. This will allow better decision making to be made when deciding which terms should and should not be included in the model.  Additionally, this will provide some indications of what outcomes would be expected from the model.
 
-plot 1 details 
+- The data will be checked to verify whether there are any combinations of variables where all the accidents are either severe or slight. This will be done by calculating the mean of severe accidents for each combination of the variables. This will allow the proportion  of severe responses to be seen.  
+- Contingency tables will be created that allows the comparison of the variables, and will allow, by inspection, to see which variables affect the accident severity.
+- Box plots were constructed to show if there are any interaction effects between the speed limit and other variables. These will be created with all of the variables. 
+- The mean speed limit will be included so that easy comparisons can be made. 
 
-![img1](./static/unnamed.png)
 
-plot 2 details
+#### Creating a regression model
+A Generalised Linear Model will be created to allow predictions to be made about how accident severity changes for different speed limits given a certain set of conditions - such as road surface, driver’s age and so on. As we have binary outcomes - severe or not severe, we will use a specific type of regression analysis called logistic regression. We will use a multiple regression model as it allows us to consider more than one factor that might affect accident severity.
 
-![img1](./static/unnamed-2.png)
+The value of each variable will then be reassessed to consider its significance in predicting accident severity. If it is not considered to be relevant, it will be removed from the model. We will consider a 5% significance level to be appropriate.    
+
+
+
 
 ```{r}
 pacman::p_load(janitor, tidyverse, lubridate, finalfit)
@@ -333,6 +337,41 @@ dat <- merge(dat, junction_df, by="accident_reference")
 dat
 ```
 
+## Results
+
+### Graphs
+
+Description and text to follow, linking to eventual regeression
+
+```{r}
+#mean_data_points()
+
+ggplot(data = dat, aes(x=factor(accident_severity), y=speed_limit))+
+  geom_boxplot()+
+  stat_summary(fun.y=mean, color='red', shape='diamond')+
+  xlab('Accident Severity')+
+  ylab('Speed Limit (Miles per Hour)')+
+  labs(title= 'The speed limit in place tends to be higher for fatal or serious accidents compared to slight accidents',
+  subtitle='Boxplot of speedlimit versus accident severity. The red diamond indicates the mean speed limit in place for each accidnent severity category')
+```
+
+```{r}
+dat <-
+  dat %>%
+  mutate(numeric_sev = case_when(accident_severity == 'Slight' ~0,
+                                 accident_severity == 'Severe' ~1))%>%
+  drop_na()
+
+ggplot(data=dat, aes(x=factor(speed_limit), y= numeric_sev))+
+  geom_bar(stat='summary', fun.y=mean, fill='indianred2')+
+  ylab('Proportion of Accidennts that are Fatal or Serious')+
+  xlab('Speed limit (miles per hour')+
+  labs(title = 'The proportion of serious or fatal accidents increases with increasign speed limit, with the exception of 70 miles per hour speed limit', subtitle='Bar graph of speed limit versus proportion of fatal or severe accidents')
+```
+Plot is static and needs implementing in rmarkdown
+
+![timeOfDay](static/unnamed-3.png)
+
 ### Regression Model
 
 In this analysis we use a specific type of regression analysis for binary outcomes called a logistic regression. 
@@ -340,7 +379,8 @@ In this analysis we use a specific type of regression analysis for binary outcom
 In addition we have included more than one variable, creating a multiple regression. This allows us to "control" for variables.
 
 - Provide better explanation as to what a logistic and multiple regression is and why it is appropriate
-- Explain in semi-lay terms how to interpret the results/coefficents (possibly exponentiate for odds?)
+- Explain in semi-lay terms how to interpret the results/coefficents (
+exponentiate for odds?)
 - Discuss the "significance" 
 ```{r,  results = TRUE}
 # dat$road_surface_conditions
@@ -362,8 +402,6 @@ mdl_summary
 
 ```{r}
 exp(mdl_summary$coefficients[,1]["speed_limit"])
-
-
 ```
 
 
