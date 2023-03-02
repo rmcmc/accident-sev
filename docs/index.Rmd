@@ -4,10 +4,11 @@ title: An investigation of the relationship between speed limit and various demo
 author: "Group 9"
 date: "27/02/2023"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 keywords: Accident Severity, Speed Limit, Great Britain, Road, Demographic, Environmental,
   Spatial
+  
 bibliography: references.bib
 csl: ieee.csl
 ---
@@ -88,15 +89,15 @@ tbl_fn <- \(x){
     adorn_pct_formatting() 
   }
 
-labs <- readxl::read_xlsx("data/Road-Safety-Open-Dataset-Data-Guide.xlsx") |> clean_names() |> 
+labs <- readxl::read_xlsx("../data/Road-Safety-Open-Dataset-Data-Guide.xlsx") |> clean_names() |> 
   ## recode NA values if missing 
   mutate(label = case_when(code_format == "-1" ~ NA,
                            str_detect(label, "nknown| self") ~ NA,
                             .default = label),
          code_format = as.numeric(code_format))
-accidents_raw <- read_csv("data/dft-road-casualty-statistics-accident-2020.csv.xls")
-vehicles_raw <- read_csv("data/dft-road-casualty-statistics-vehicle-2020.csv.xls")  
-casualties_raw <- read_csv("data/dft-road-casualty-statistics-casualty-2020.csv.xls")
+accidents_raw <- read_csv("../data/dft-road-casualty-statistics-accident-2020.csv.xls")
+vehicles_raw <- read_csv("../data/dft-road-casualty-statistics-vehicle-2020.csv.xls")  
+casualties_raw <- read_csv("../data/dft-road-casualty-statistics-casualty-2020.csv.xls")
 ```
 
 ```{r}
@@ -369,7 +370,7 @@ ggplot(data=dat, aes(x=factor(speed_limit), y= numeric_sev))+
 ```
 Plot is static and needs implementing in rmarkdown
 
-![timeOfDay](static/unnamed-3.png)
+![timeOfDay](../static/unnamed-3.png)
 
 ### Regression Model
 
