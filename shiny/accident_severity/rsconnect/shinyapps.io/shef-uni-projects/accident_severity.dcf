@@ -5,10 +5,10 @@ account: shef-uni-projects
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8415150
-bundleId: 6889641
+bundleId: 6945721
 url: https://shef-uni-projects.shinyapps.io/accident_severity/
-when: 1677428824.23005
-lastSyncTime: 1677428824.23006
+when: 1678545194.29809
+lastSyncTime: 1678545194.2981
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: data/LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Lookup_for_England_and_Wales.csv|data/Road-Safety-Open-Dataset-Data-Guide.xlsx
+ignoredFiles: data/dft-road-casualty-statistics-accident-2020.csv.xls|data/dft-road-casualty-statistics-casualty-2020.csv.xls|data/dft-road-casualty-statistics-vehicle-2020.csv.xls|data/Road-Safety-Open-Dataset-Data-Guide.xlsx|dft-road-casualty-statistics-accident-2020.csv.xls|dft-road-casualty-statistics-casualty-2020.csv.xls|dft-road-casualty-statistics-vehicle-2020.csv.xls|MAS61004_project_clean_data-2.R|Road-Safety-Open-Dataset-Data-Guide.xlsx
