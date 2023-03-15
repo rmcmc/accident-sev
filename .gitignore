@@ -3,6 +3,6 @@
 .RData
 .Ruserdata
 .data
-.csv
-.xls
-.xlsx
+*.csv
+*.xls
+*.xlsx

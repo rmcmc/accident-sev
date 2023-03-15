@@ -18,7 +18,20 @@ library(lubridate)
 ################################################
 
 # Generate the code
-#source("final_karthik_2.R")
+#source("MAS61004_project_clean_data-2.R")
+
+df <- read.csv("./shiny_df.csv") %>%
+  mutate(
+    accident_severity = case_when(
+      accident_severity == "Slight" ~ 0,
+      accident_severity == "Severe" ~ 1
+    )
+  ) %>%
+  select(!X)
+
+mdl <- glm(accident_severity ~ ., data = df, family = binomial())
+
+mdl_summary <- summary(mdl)
 
 
 # Baseline predictions
@@ -28,20 +41,25 @@ zeros_vector <- rep(0, n_samples)
 
 # Baseline dataset
 baseline_new_data <- list(
-  speed_limit = speeds,
-  speed_limit_squared = speeds^2,
-  road_surface_conditions = rep("Dry", n_samples),
-  trunk_road = rep("Trunk", n_samples),
-  urban_or_rural_area = rep("Urban", n_samples),
-  time_of_day = rep("7-10am", n_samples),
-  vehicle_max_age = rep(5, n_samples),
-  vehicle_car = rep(FALSE, n_samples),
-  vehicle_heavy = rep(FALSE, n_samples),
-  vehicle_other = rep(FALSE, n_samples),
-  vehicle_motorcycle = rep(FALSE, n_samples),
-  vehicle_pedal_cycle = rep(FALSE, n_samples)
-  vehicle_driver_age_u25 = rep(FALSE, n_samples),
-  casualty_pedestrian = rep(FALSE, n_samples)
+  speed_limit = speeds, #
+  speed_limit_squared = speeds^2, #
+  road_surface_conditions = rep("Dry", n_samples), #
+  trunk_road = rep("Trunk", n_samples), #
+  urban_or_rural_area = rep("Urban", n_samples), #
+  time_of_day = rep("7-10am", n_samples), #
+  vehicle_max_age = rep(5, n_samples), #
+  vehicle_car = rep('No', n_samples), #
+  vehicle_heavy = rep('No', n_samples),#
+  vehicle_other = rep('No', n_samples),#
+  vehicle_motorcycle = rep('No', n_samples),#
+  vehicle_pedal_cycle = rep('No', n_samples),#
+  vehicle_female_driver = rep('No', n_samples),
+  vehicle_driver_age_under_25 = rep('No', n_samples),
+  casualty_cyclist= rep('No', n_samples),
+  casualty_car_occupant= rep('No', n_samples),
+  casualty_motorcycle= rep('No', n_samples),
+  casualty_pedestrian= rep('No', n_samples),
+  casualty_other_vehicle = rep('No', n_samples)
 )
 
 # Predict probsba
@@ -90,8 +108,8 @@ curves_side <-
     selectInput("trunk_road",
                 "Trunk Road",
                 c(
-                  "Not Trunk Road" = "not_trunk_road",
-                  "Trunk Road" = "trunk_road"
+                  "Not Trunk Road" = "Non-trunk",
+                  "Trunk Road" = "Trunk"
                 ),
                 multiple = FALSE,
                 selected = "trunk_road"
@@ -113,33 +131,41 @@ curves_side <-
       min = 0, max = 30,
       value = 5
     ),
-    checkboxInput("car_involved",
-      "Car Involved",
-      value = FALSE
+    selectInput("cyclist_casualty",
+                "Cyclist Casualty",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     ),
-    checkboxInput("heavy_involved",
-      "Heavy Vehicle Involved",
-      value = FALSE
+    selectInput("pedestrian_casualty",
+                "Pedestrian Casualty",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     ),
-    checkboxInput("bicyle_involved",
-      "Bicycle Involved",
-      value = FALSE
+    selectInput("motorbike_casualty",
+                "Motorcycle Casualty",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     ),
-    checkboxInput("motorcycle_involved",
-      "Motorcycle Involved",
-      value = FALSE
-    ),
-    checkboxInput("other_involved",
-                  "Other Vehicle Type Involved",
-                  value = FALSE
-    ),
-    checkboxInput("pedestrian_involved",
-                  "Pedestrian Casualty",
-                  value = FALSE
-    ),
-    checkboxInput("u25_driver",
-      "Driver Under 25 Involved",
-      value = FALSE
+    selectInput("u25_driver",
+                "Driver Under 25 Involved",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     )
   )
 
@@ -179,8 +205,8 @@ calc_side <-
     selectInput("trunk_road_calc",
                 "Trunk Road",
                 c(
-                  "Not Trunk Road" = "not_trunk_road",
-                  "Trunk Road" = "trunk_road"
+                  "Not Trunk Road" = "Non-trunk",
+                  "Trunk Road" = "Trunk"
                 ),
                 multiple = FALSE,
                 selected = "Urban"
@@ -202,33 +228,41 @@ calc_side <-
                 min = 0, max = 30,
                 value = 5
     ),
-    checkboxInput("car_involved_calc",
-                  "Car Involved",
-                  value = FALSE
+    selectInput("cyclist_casualty_calc",
+                "Cyclist Casualty",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     ),
-    checkboxInput("heavy_involved_calc",
-                  "Heavy Vehicle Involved",
-                  value = FALSE
+    selectInput("pedestrian_casualty_calc",
+                "Pedestrian Casualty",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     ),
-    checkboxInput("bicyle_involved_calc",
-                  "Bicycle Involved",
-                  value = FALSE
+    selectInput("motorbike_casualty_calc",
+                "Motorcycle Casualty",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     ),
-    checkboxInput("motorcycle_involved_calc",
-                  "Motorcycle Involved",
-                  value = FALSE
-    ),
-    checkboxInput("other_involved_calc",
-                  "Other Vehicle Type Involved",
-                  value = FALSE
-    ),
-    checkboxInput("pedestrian_involved_calc",
-                  "Pedestrian Casualty",
-                  value = FALSE
-    ),
-    checkboxInput("u25_driver_calc",
-                  "Driver Under 25 Involved",
-                  value = FALSE
+    selectInput("u25_driver_calc",
+                "Driver Under 25 Involved",
+                c(
+                  "No" = "No",
+                  "Yes" = "Yes"
+                ),
+                multiple = FALSE,
+                selected = "No"
     ),
     actionButton("pred_and_append", "Predict")
   )
@@ -340,19 +374,29 @@ server <- function(input, output) {
 
   output$logReg <- renderPlot({
     newdata <- list(
-      speed_limit = speeds,
+      speed_limit = speeds, 
+      speed_limit_squared = speeds^2,
       road_surface_conditions = rep(input$road_conditions, n_samples),
+      trunk_road = rep(input$trunk_road, n_samples),
       urban_or_rural_area = rep(input$urban_or_rural, n_samples),
       time_of_day = rep(input$time_of_day, n_samples),
       vehicle_max_age = rep(input$max_age, n_samples),
-      casualty_cyclist = rep(input$cyclist_involved, n_samples),
-      casualty_car_occupant = rep(input$passenger_involved, n_samples),
-      casualty_motorcycle = rep(input$motorcycle_involved, n_samples),
-      casualty_pedestrian = rep(input$pedestrian_involved, n_samples),
-      casualty_other_vehicle = rep(FALSE, n_samples),
-      driver_u25 = rep(input$u25_driver, n_samples)
+      casualty_cyclist = rep(input$cyclist_casualty, n_samples),
+      casualty_motorcycle= rep(input$motorbike_casualty, n_samples),
+      casualty_pedestrian= rep(input$pedestrian_casualty, n_samples),
+      vehicle_driver_age_under_25 = rep(input$u25_driver, n_samples),
+      vehicle_car = rep('No', n_samples), 
+      vehicle_heavy = rep('No', n_samples),
+      vehicle_other = rep('No', n_samples),
+      vehicle_motorcycle = rep('No', n_samples),
+      vehicle_pedal_cycle = rep('No', n_samples),
+      vehicle_female_driver = rep('No', n_samples),
+      casualty_other_vehicle = rep('No', n_samples),
+      casualty_car_occupant= rep('No', n_samples)
     )
-
+    
+    
+    
     predicted_vals <- predict(
       mdl,
       type = "response",
@@ -420,14 +464,15 @@ server <- function(input, output) {
       table_data = tibble(
         Speed = numeric(),
         `Road Conditions` = character(),
+        `Trunk Road` = character(),
         `Urban or Rural` = character(),
         `Time of Day` = character(),
         `Age Oldest Vehicle` = numeric(),
-        `Cyclist Involved` = logical(),
-        `Car Passenger Involved` = logical(),
-        `Motorcycle Involved` = logical(),
-        `Pedestrian Involved` = logical(),
-        Probability = numeric(),
+        `Cyclist Casualty` = character(),
+        `Pedestrian Casualty` = character(),
+        `Motorcycle Casualty` = character(),
+        `Under 25 Driver`= character(),
+         Probability = numeric(),
         `Prob 95% CI Lower Bound ` = numeric(),
         `Prob 95% CI Upper Bound ` = numeric()
       )
@@ -436,17 +481,25 @@ server <- function(input, output) {
   observeEvent(input$pred_and_append, {
     calc_data <-
       tibble(
-        speed_limit = input$speed_calc,
+        speed_limit = input$speed_calc, 
+        speed_limit_squared = input$speed_calc^2,
         road_surface_conditions = input$road_conditions_calc,
-        urban_or_rural_area = input$urban_or_rural_calc,
-        time_of_day = input$time_of_day_calc,
-        vehicle_max_age = input$max_age_calc,
-        casualty_cyclist = input$cyclist_involved_calc,
-        casualty_car_occupant = input$passenger_involved_calc,
-        casualty_motorcycle = input$motorcycle_involved_calc,
-        casualty_pedestrian = input$pedestrian_involved_calc,
-        casualty_other_vehicle = FALSE,
-        driver_u25 = input$u25_driver_calc
+        trunk_road = input$trunk_road_calc,
+        urban_or_rural_area = input$urban_or_rural_calc, 
+        time_of_day = input$time_of_day_calc, 
+        vehicle_max_age = input$max_age_calc, 
+        casualty_cyclist = input$cyclist_casualty_calc, 
+        casualty_motorcycle= input$motorbike_casualty_calc, 
+        casualty_pedestrian= input$pedestrian_casualty_calc, 
+        vehicle_driver_age_under_25 = input$u25_driver_calc,
+        vehicle_car = 'No',
+        vehicle_heavy = 'No',
+        vehicle_other = 'No', 
+        vehicle_motorcycle = 'No', 
+        vehicle_pedal_cycle = 'No', 
+        vehicle_female_driver = 'No', 
+        casualty_other_vehicle = 'No', 
+        casualty_car_occupant= 'No'
       )
 
     prob <- predict(mdl, calc_data, type = "response", se.fit = TRUE)
@@ -460,18 +513,21 @@ server <- function(input, output) {
       add_row(
         Speed = input$speed_calc,
         `Road Conditions` = input$road_conditions_calc,
+        `Trunk Road` = input$trunk_road_calc,
         `Urban or Rural` = input$urban_or_rural_calc,
         `Time of Day` = input$time_of_day_calc,
         `Age Oldest Vehicle` = input$max_age_calc,
-        `Cyclist Involved` = input$cyclist_involved_calc,
-        `Car Passenger Involved` = input$passenger_involved_calc,
-        `Motorcycle Involved` = input$motorcycle_involved_calc,
-        `Pedestrian Involved` = input$pedestrian_involved_calc,
-        Probability = round(prob$fit, 3),
+        `Cyclist Casualty` = input$cyclist_casualty_calc,
+        `Motorcycle Casualty` = input$motorbike_casualty_calc,
+        `Pedestrian Casualty` = input$pedestrian_casualty_calc,
+        `Under 25 Driver`= input$u25_driver_calc,
+         Probability = round(prob$fit, 3),
         `Prob 95% CI Lower Bound ` = round(lower, 3),
         `Prob 95% CI Upper Bound ` = round(upper, 3)
       )
   })
+  
+
 
   output$table <- DT::renderDT(
     reactive_results$table_data,
