@@ -18,20 +18,7 @@ library(lubridate)
 ################################################
 
 # Generate the code
-# source("accident_severity/MAS61004_project_clean_data-2.R")
-
-df <- read.csv("./shiny_df.csv") %>%
-  mutate(
-    accident_severity = case_when(
-      accident_severity == "Slight" ~ 0,
-      accident_severity == "Severe" ~ 1
-    )
-  ) %>%
-  select(!X)
-
-mdl <- glm(accident_severity ~ ., data = df, family = binomial())
-
-mdl_summary <- summary(mdl)
+#source("final_karthik_2.R")
 
 
 # Baseline predictions
@@ -42,16 +29,19 @@ zeros_vector <- rep(0, n_samples)
 # Baseline dataset
 baseline_new_data <- list(
   speed_limit = speeds,
+  speed_limit_squared = speeds^2,
   road_surface_conditions = rep("Dry", n_samples),
+  trunk_road = rep("Trunk", n_samples),
   urban_or_rural_area = rep("Urban", n_samples),
-  time_of_day = rep("day_off_peak", n_samples),
+  time_of_day = rep("7-10am", n_samples),
   vehicle_max_age = rep(5, n_samples),
-  casualty_cyclist = rep(FALSE, n_samples),
-  casualty_car_occupant = rep(FALSE, n_samples),
-  casualty_motorcycle = rep(FALSE, n_samples),
-  casualty_pedestrian = rep(FALSE, n_samples),
-  casualty_other_vehicle = rep(FALSE, n_samples),
-  driver_u25 = rep(FALSE, n_samples)
+  vehicle_car = rep(FALSE, n_samples),
+  vehicle_heavy = rep(FALSE, n_samples),
+  vehicle_other = rep(FALSE, n_samples),
+  vehicle_motorcycle = rep(FALSE, n_samples),
+  vehicle_pedal_cycle = rep(FALSE, n_samples)
+  vehicle_driver_age_u25 = rep(FALSE, n_samples),
+  casualty_pedestrian = rep(FALSE, n_samples)
 )
 
 # Predict probsba
@@ -97,37 +87,55 @@ curves_side <-
       multiple = FALSE,
       selected = "Urban"
     ),
+    selectInput("trunk_road",
+                "Trunk Road",
+                c(
+                  "Not Trunk Road" = "not_trunk_road",
+                  "Trunk Road" = "trunk_road"
+                ),
+                multiple = FALSE,
+                selected = "trunk_road"
+    ),
     selectInput("time_of_day",
       "Time of Day",
       c(
-        "Peak - Morning (7AM - 10AM)" = "morning_peak",
-        "Peak - Evening (4PM - 7PM)" = "evening_peak",
-        "Off Peak - Day (10AM - 4PM)" = "day_off_peak",
-        "Off Peak - Night (7PM - 7AM)" = "night_off_peak"
+        "Peak - Morning (7AM - 10AM)" = "7-10am",
+        "Peak - Evening (4PM - 7PM)" = "4-7pm",
+        "Off Peak - Day (10AM - 4PM)" = "10am-4pm",
+        "Off Peak - Evening (11PM - 7AM)"= "7-11pm",
+        "Off Peak - Night (11PM - 7AM)" = "11pm-7am"
       ),
       multiple = FALSE,
-      selected = "day_off_peak"
+      selected = "7-10am"
     ),
     sliderInput("max_age",
       "Age of Oldest Vehicle Involved:",
       min = 0, max = 30,
       value = 5
     ),
-    checkboxInput("cyclist_involved",
-      "Cyclist Involved",
+    checkboxInput("car_involved",
+      "Car Involved",
       value = FALSE
     ),
-    checkboxInput("passenger_involved",
-      "Car Passanger Involved",
+    checkboxInput("heavy_involved",
+      "Heavy Vehicle Involved",
+      value = FALSE
+    ),
+    checkboxInput("bicyle_involved",
+      "Bicycle Involved",
       value = FALSE
     ),
     checkboxInput("motorcycle_involved",
       "Motorcycle Involved",
       value = FALSE
     ),
+    checkboxInput("other_involved",
+                  "Other Vehicle Type Involved",
+                  value = FALSE
+    ),
     checkboxInput("pedestrian_involved",
-      "Pedestrian Involved",
-      value = FALSE
+                  "Pedestrian Casualty",
+                  value = FALSE
     ),
     checkboxInput("u25_driver",
       "Driver Under 25 Involved",
@@ -151,58 +159,76 @@ calc_side <-
       step = 1
     ),
     selectInput("road_conditions_calc",
-      "Road Surface Condtions",
-      c(
-        "Dry" = "Dry",
-        "Wet or Damp" = "Wet or damp"
-      ),
-      multiple = FALSE,
-      selected = "Dry"
+                "Road Surface Condtions",
+                c(
+                  "Dry" = "Dry",
+                  "Wet or Damp" = "Wet or damp"
+                ),
+                multiple = FALSE,
+                selected = "Dry"
     ),
     selectInput("urban_or_rural_calc",
-      "Urban or Rural",
-      c(
-        "Urban" = "Urban",
-        "Rural" = "Rural"
-      ),
-      multiple = FALSE,
-      selected = "Urban"
+                "Urban or Rural",
+                c(
+                  "Urban" = "Urban",
+                  "Rural" = "Rural"
+                ),
+                multiple = FALSE,
+                selected = "Urban"
+    ),
+    selectInput("trunk_road_calc",
+                "Trunk Road",
+                c(
+                  "Not Trunk Road" = "not_trunk_road",
+                  "Trunk Road" = "trunk_road"
+                ),
+                multiple = FALSE,
+                selected = "Urban"
     ),
     selectInput("time_of_day_calc",
-      "Time of Day",
-      c(
-        "Peak - Morning (7AM - 10AM)" = "morning_peak",
-        "Peak - Evening (4PM - 7PM)" = "evening_peak",
-        "Off Peak - Day (10AM - 4PM)" = "day_off_peak",
-        "Off Peak - Night (7PM - 7AM)" = "night_off_peak"
-      ),
-      multiple = FALSE,
-      selected = "day_off_peak"
+                "Time of Day",
+                c(
+                  "Peak - Morning (7AM - 10AM)" = "7-10am",
+                  "Peak - Evening (4PM - 7PM)" = "4-7pm",
+                  "Off Peak - Day (10AM - 4PM)" = "10am-4pm",
+                  "Off Peak - Evening (11PM - 7AM)"= "7-11pm",
+                  "Off Peak - Night (11PM - 7AM)" = "11pm-7am"
+                ),
+                multiple = FALSE,
+                selected = "7-10am"
     ),
     sliderInput("max_age_calc",
-      "Age of Oldest Vehicle Involved:",
-      min = 0, max = 30,
-      value = 5
+                "Age of Oldest Vehicle Involved:",
+                min = 0, max = 30,
+                value = 5
     ),
-    checkboxInput("cyclist_involved_calc",
-      "Cyclist Involved",
-      value = FALSE
+    checkboxInput("car_involved_calc",
+                  "Car Involved",
+                  value = FALSE
     ),
-    checkboxInput("passenger_involved_calc",
-      "Car Passanger Involved",
-      value = FALSE
+    checkboxInput("heavy_involved_calc",
+                  "Heavy Vehicle Involved",
+                  value = FALSE
+    ),
+    checkboxInput("bicyle_involved_calc",
+                  "Bicycle Involved",
+                  value = FALSE
     ),
     checkboxInput("motorcycle_involved_calc",
-      "Motorcycle Involved",
-      value = FALSE
+                  "Motorcycle Involved",
+                  value = FALSE
+    ),
+    checkboxInput("other_involved_calc",
+                  "Other Vehicle Type Involved",
+                  value = FALSE
     ),
     checkboxInput("pedestrian_involved_calc",
-      "Pedestrian Involved",
-      value = FALSE
+                  "Pedestrian Casualty",
+                  value = FALSE
     ),
     checkboxInput("u25_driver_calc",
-      "Driver Under 25 Involved",
-      value = FALSE
+                  "Driver Under 25 Involved",
+                  value = FALSE
     ),
     actionButton("pred_and_append", "Predict")
   )
@@ -233,7 +259,7 @@ ui <- fluidPage(
       sidebarLayout(
         calc_side,
         mainPanel(
-          DT::DTOutput("table")
+          DT::DTOutput("table", width = "110%")
         )
       )
     ),
@@ -253,10 +279,9 @@ ui <- fluidPage(
 
 html_plot_description <-
   "
-        <h2>Plot Details</h2>
+      <h2>Plot Details</h2>
 
-      This is a regression output of probability of severe accident 
-      (death or serious injury) in
+      This chart demons
 
       The baseline model is fixed and represents the probability if the crash:
 
@@ -271,11 +296,24 @@ about_html <-
   "
         <h1>How to Use This App</h1>
 
+        <p>This application contains two tools based on the same statistical model.
+        The plot gives a visual indication of how crash severity changes with
+        speed limit</p>
+
         <h2>Background</h2>
 
-        <p>This application has been developed by team XYZ as
+        <p>This application has been developed to help understand the 
         a part of the investigation into
         crash severivity in the UK</p>
+
+        <h2>Data Sources</h2>
+
+        <p>The data for this app was taken from the data.gov.uk portal for road
+        traffic saftey. 2020 datasets have been amalgamated.</p>
+
+
+        <h2>Model</h2>
+
 
         <h2>Plot A</h2>
 
@@ -287,6 +325,8 @@ about_html <-
         	<li>Bullet A</li>
         	<li>Bullet&nbsp;<strong>Bold!</strong></li>
         </ul>
+
+
         "
 
 ################################################
@@ -384,6 +424,9 @@ server <- function(input, output) {
         `Time of Day` = character(),
         `Age Oldest Vehicle` = numeric(),
         `Cyclist Involved` = logical(),
+        `Car Passenger Involved` = logical(),
+        `Motorcycle Involved` = logical(),
+        `Pedestrian Involved` = logical(),
         Probability = numeric(),
         `Prob 95% CI Lower Bound ` = numeric(),
         `Prob 95% CI Upper Bound ` = numeric()
@@ -421,6 +464,9 @@ server <- function(input, output) {
         `Time of Day` = input$time_of_day_calc,
         `Age Oldest Vehicle` = input$max_age_calc,
         `Cyclist Involved` = input$cyclist_involved_calc,
+        `Car Passenger Involved` = input$passenger_involved_calc,
+        `Motorcycle Involved` = input$motorcycle_involved_calc,
+        `Pedestrian Involved` = input$pedestrian_involved_calc,
         Probability = round(prob$fit, 3),
         `Prob 95% CI Lower Bound ` = round(lower, 3),
         `Prob 95% CI Upper Bound ` = round(upper, 3)
@@ -430,6 +476,7 @@ server <- function(input, output) {
   output$table <- DT::renderDT(
     reactive_results$table_data,
     extensions = c("Buttons", "Scroller"),
+    rownames=FALSE,
     options = list(
       dom = "Bfrtip",
       lengthChange = FALSE,
@@ -437,6 +484,7 @@ server <- function(input, output) {
       scrollY = 500,
       searchable = FALSE,
       searching = FALSE,
+      scrollX = TRUE,
       buttons = c("csv")
     )
   )
