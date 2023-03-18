@@ -35,7 +35,7 @@ mdl_summary <- summary(mdl)
 
 
 # Baseline predictions
-speeds <- seq(10, 90, 1)
+speeds <- seq(20, 70, 1)
 n_samples <- length(speeds)
 zeros_vector <- rep(0, n_samples)
 
@@ -44,7 +44,7 @@ baseline_new_data <- list(
   speed_limit = speeds, #
   speed_limit_squared = speeds^2, #
   road_surface_conditions = rep("Dry", n_samples), #
-  trunk_road = rep("Trunk", n_samples), #
+  trunk_road = rep("Non-trunk", n_samples), #
   urban_or_rural_area = rep("Urban", n_samples), #
   time_of_day = rep("7-10am", n_samples), #
   vehicle_max_age = rep(5, n_samples), #
@@ -157,15 +157,6 @@ curves_side <-
                 ),
                 multiple = FALSE,
                 selected = "No"
-    ),
-    selectInput("u25_driver",
-                "Driver Under 25 Involved",
-                c(
-                  "No" = "No",
-                  "Yes" = "Yes"
-                ),
-                multiple = FALSE,
-                selected = "No"
     )
   )
 
@@ -255,15 +246,6 @@ calc_side <-
                 multiple = FALSE,
                 selected = "No"
     ),
-    selectInput("u25_driver_calc",
-                "Driver Under 25 Involved",
-                c(
-                  "No" = "No",
-                  "Yes" = "Yes"
-                ),
-                multiple = FALSE,
-                selected = "No"
-    ),
     actionButton("pred_and_append", "Predict")
   )
 
@@ -277,7 +259,14 @@ ui <- fluidPage(
   titlePanel("Accident Severity Tool"),
   tabsetPanel(
     tabPanel(
-      "Curve Plots",
+      "About",
+      fluid = TRUE,
+      mainPanel(
+        htmlOutput("info")
+      )
+    ),
+    tabPanel(
+      "Risk Plot",
       fluid = TRUE,
       sidebarLayout(
         curves_side,
@@ -288,20 +277,13 @@ ui <- fluidPage(
       )
     ),
     tabPanel(
-      "Calulate",
+      "Risk Table",
       fluid = TRUE,
       sidebarLayout(
         calc_side,
         mainPanel(
           DT::DTOutput("table", width = "110%")
         )
-      )
-    ),
-    tabPanel(
-      "About",
-      fluid = TRUE,
-      mainPanel(
-        htmlOutput("info")
       )
     )
   )
@@ -384,7 +366,6 @@ server <- function(input, output) {
       casualty_cyclist = rep(input$cyclist_casualty, n_samples),
       casualty_motorcycle= rep(input$motorbike_casualty, n_samples),
       casualty_pedestrian= rep(input$pedestrian_casualty, n_samples),
-      vehicle_driver_age_under_25 = rep(input$u25_driver, n_samples),
       vehicle_car = rep('No', n_samples), 
       vehicle_heavy = rep('No', n_samples),
       vehicle_other = rep('No', n_samples),
@@ -392,7 +373,8 @@ server <- function(input, output) {
       vehicle_pedal_cycle = rep('No', n_samples),
       vehicle_female_driver = rep('No', n_samples),
       casualty_other_vehicle = rep('No', n_samples),
-      casualty_car_occupant= rep('No', n_samples)
+      casualty_car_occupant= rep('No', n_samples),
+      vehicle_driver_age_under_25 = rep('No', n_samples)
     )
     
     
@@ -414,8 +396,8 @@ server <- function(input, output) {
 
 
     main_plot <- ggplot(data = results, aes(x = speeds, y = pred)) +
-      geom_line(color = "red") +
-      scale_x_continuous(breaks = seq(0, 100, 10), limits = c(10, 90)) +
+      geom_line(color = "red", ,size=1.5) +
+      scale_x_continuous(breaks = seq(20, 70, 10), limits = c(20, 70)) +
       scale_y_continuous(breaks = seq(0, 1, by = 0.2), limits = c(0, 1)) +
       labs(
         title = "Probability Plot", x = "Speed Limit (MPH)",
@@ -434,7 +416,7 @@ server <- function(input, output) {
         geom_ribbon(
           data = results,
           aes(ymin = lower_ci, ymax = upper_ci),
-          alpha = 0.5,
+          alpha = 0.25,
           fill = "red"
         )
     }
@@ -442,7 +424,7 @@ server <- function(input, output) {
     if (input$show_baseline) {
       main_plot <-
         main_plot +
-        geom_line(data = baseline_data, color = "darkgrey")
+        geom_line(data = baseline_data, color = "darkblue", size=1.5)
 
       if (input$show_ci) {
         main_plot <-
@@ -450,8 +432,8 @@ server <- function(input, output) {
           geom_ribbon(
             data = baseline_data,
             aes(ymin = lower_ci, ymax = upper_ci),
-            alpha = 0.5,
-            fill = "darkgrey"
+            alpha = 0.25,
+            fill = "darkblue"
           )
       }
     }
@@ -471,7 +453,6 @@ server <- function(input, output) {
         `Cyclist Casualty` = character(),
         `Pedestrian Casualty` = character(),
         `Motorcycle Casualty` = character(),
-        `Under 25 Driver`= character(),
          Probability = numeric(),
         `Prob 95% CI Lower Bound ` = numeric(),
         `Prob 95% CI Upper Bound ` = numeric()
@@ -491,7 +472,7 @@ server <- function(input, output) {
         casualty_cyclist = input$cyclist_casualty_calc, 
         casualty_motorcycle= input$motorbike_casualty_calc, 
         casualty_pedestrian= input$pedestrian_casualty_calc, 
-        vehicle_driver_age_under_25 = input$u25_driver_calc,
+        vehicle_driver_age_under_25 = 'No',
         vehicle_car = 'No',
         vehicle_heavy = 'No',
         vehicle_other = 'No', 
@@ -520,7 +501,6 @@ server <- function(input, output) {
         `Cyclist Casualty` = input$cyclist_casualty_calc,
         `Motorcycle Casualty` = input$motorbike_casualty_calc,
         `Pedestrian Casualty` = input$pedestrian_casualty_calc,
-        `Under 25 Driver`= input$u25_driver_calc,
          Probability = round(prob$fit, 3),
         `Prob 95% CI Lower Bound ` = round(lower, 3),
         `Prob 95% CI Upper Bound ` = round(upper, 3)

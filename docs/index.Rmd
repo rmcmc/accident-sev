@@ -1,7 +1,7 @@
 ---
 title: An investigation of the relationship between speed limit and various demographic,
   environmental and spatial factors on road accident severity in Great Britain
-author: "Group 9"
+author: "Group 7"
 date: "27/02/2023"
 output:
   pdf_document: default
@@ -17,69 +17,21 @@ csl: ieee.csl
 knitr::opts_chunk$set(echo = FALSE, results = FALSE, warning = FALSE, message = FALSE)
 ```
 
-## Introduction
-
-According to the World Health Organisation, there are approximately 1.3 million fatalities globally each year due to road traffic accidents @who. Indeed, road traffic injuries are the primary cause of death for those aged between five and 29 years old @who. Vulnerable road users such as pedestrians, cyclists and motorcyclists account for over half of all road traffic accident fatalities globally @who. Although most deaths occur in low- to middle-income countries, it is nevertheless an issue of significant concern for high-income countries also.  
-
-It is well-documented that driving at an increased speed is related to both the risk of a road traffic accident and the severity of the accident, should it occur. It is reported that for every 1% increase in speed, there is a corresponding 3% increase in risk of serious crashes and 4% increase in the risk of fatal crashes. @who Other risk factors for accident severity include demographic factors; approximately three quarters (73%) of all road traffic fatalities involve males under 25 years old @who. In addition, it can be hypothesised that variables such as the time of day that the accident occurred, the condition of the road surface where the accident occurred e.g. the presence of ice which could lead to skidding or water which could result in a longer stoppage time, and the location of the accident in terms of whether it occurred close to a junction or not, could also contribute to the severity of a road traffic accident. 
-
-An increased understanding of the impact of these factors on road accident severity could aid policymakers in decision making and be used to inform awareness campaigns aimed to promote safe driving practices. A clearer understanding of the impact of contributing factors to increased road accident severity could result in the introduction of more targeted preventative measures and a more optimal use of finite resources, aimed at increasing road safety.
-
-The primary aim of this analysis is to determine the relationship between severity of road traffic accidents in Great Britain and the speed limit in place where the accident occurred. Secondary aims include investigating the effects of environmental, spatial and demographic factors on road accident severity. More specifically, the relationship between accident severity and road surface conditions, time of day, casualty type (e.g. pedestrian, cyclist, car occupant), junction location and involvement of males under 25 years old, will be explored as secondary aims.
-
-Information on the data source and methods used to analyse the data will be provided in the subsequent Methods section. The Results section will present the main findings, including figures and tables. The Conclusions and Discussion section will elaborate on the findings and discuss the limitations of the analysis. 
-
-
-## Methods
-
-### Data Sources
-
-This retrospective analysis utilised road safety data for the year 2020, which is available online from the UK’s Department of Transport @gov. The data which is published provides details of road accidents which occurred on public roads in Great Britain, involved at least one vehicle and which resulted in human injury. Information is available on the circumstances of the accident, such as weather conditions, time of day, visibility, speed limit, road type and surface conditions. In addition, data is available on the types of vehicles and characteristics of the casualties involved. 
-
-The outcome variable selected for this analysis was road accident severity. The available data reports accident severity as fatal, serious or slight. For this analysis, the fatal and serious groups were combined, so that accidents were sub-divided into two categories: ‘fatal or serious’ and ‘slight’. In addition, a subset of the other available variables were extracted from the data for analysis, based on their likelihood to impact accident severity. An overview of the selected variables and how they were coded for analysis is provided in the Appendix, Table 1.
-
-
-### Selection of variables
-
-There are too many variables included in the data sets to use all of them so a selection of variables were selected. These variables were selected to show a wide range of factors that could impact on accident severity. 
-
-- Speed limit (accidents data): The relationship between speed limit and accident severity  is the main focus of the study. Speed limit can be considered as a categorical variable as there is only a set number of speed limit options. However, it is impossible to tell from the data whether a vehicle is travelling at, above or below the speed limit. Thus, the speed limit will be considered as a continuous, quantitative variable.  Moreover, this will allow increased flexibility when predicting accident severity at different speeds.
-- Road surface conditions (accidents data): This is often considered to be a key factor in accidents and it is vital to consider if this impacts on accident severity. The original data set had seven categories. However, five of these categories contained only a total of 2.4% of all accidents. It was therefore considered to be reasonable to reduce this to two variables. These were dry and wet/damp which contain 68.7% and 28.8%, respectively, of all accidents.
-- Time of day (accidents data): time of day was considered important to include as it allows for the impact of the tiredness of the driver to be included in the model, as well as other associated driving issues such as drunk drivers. The original data records the actual time of each accident. This was reduced to the subcategories of night off peak (7pm-7am), morning peak (7am-10am), day off peak (10am-4pm) and evening peak (4pm-7pm). There was a fairly even split of accidents between each category: 24.9%, 14.2%, 37% and 23.9% respectively. There was no data missing for this variable.
-- Casualty type (casualty data sheet): The type of casualty was considered to be an interesting variable. The raw data contains many types of casualty which has been collapsed to car occupant (55.5%), cyclist (14.1%), motorcyclist (11.4%) , pedestrian (12.8%) and all other vehicles (6.2%). Although some groups contain more than others, each group contains enough entries to justify their inclusion in the analysis.
-- Age and gender of driver (vehicle data sheet): Young, male drivers are often cited as causing the highest number of accidents. It was therefore considered vital to examine the impact that these drivers have on accident severity. As accidents often involve multiple drivers it is difficult to analyse their impact. In each accident the age of the youngest driver was recorded, and it was possible to isolate all accidents that contained a driver who was male and under 25 years old. Thus allowing the impact of the driver’s age on accident severity to be assessed. 
--Proximity to a junction (vehicle data sheet): The proximity to a junction could impact the severity of an accident. The raw data contained many categories which were collapsed into two categories. These are “at a junction/roundabout” or “not at a junction/roundabout”.  Each category contains …% and …% of results.
-- There were some entries that have recordings of” not available” or “unknown”. These were only a very small proportion of the data so it was considered valid to discount these from our analysis.
-
-### Data analysis
-
-#### Checking tyhe Variable Selection
-
-After having selected the initial variables that were thought of having an impact on accident severity some exploratory data analysis was conducted to see if this was in fact the case. This will allow better decision making to be made when deciding which terms should and should not be included in the model.  Additionally, this will provide some indications of what outcomes would be expected from the model.
-
-- The data will be checked to verify whether there are any combinations of variables where all the accidents are either severe or slight. This will be done by calculating the mean of severe accidents for each combination of the variables. This will allow the proportion  of severe responses to be seen.  
-- Contingency tables will be created that allows the comparison of the variables, and will allow, by inspection, to see which variables affect the accident severity.
-- Box plots were constructed to show if there are any interaction effects between the speed limit and other variables. These will be created with all of the variables. 
-- The mean speed limit will be included so that easy comparisons can be made. 
-
-
-#### Creating a regression model
-A Generalised Linear Model will be created to allow predictions to be made about how accident severity changes for different speed limits given a certain set of conditions - such as road surface, driver’s age and so on. As we have binary outcomes - severe or not severe, we will use a specific type of regression analysis called logistic regression. We will use a multiple regression model as it allows us to consider more than one factor that might affect accident severity.
-
-The value of each variable will then be reassessed to consider its significance in predicting accident severity. If it is not considered to be relevant, it will be removed from the model. We will consider a 5% significance level to be appropriate.    
-
-
-
-
 ```{r}
-pacman::p_load(janitor, tidyverse, lubridate, finalfit)
+## load packages and data---------------------------------------------------
+library(janitor)
+library(tidyverse)
+library(lubridate)
+library(finalfit)
+library(patchwork)
+library(lmtest)
 
 # function to replace values in df with labels from reference doc
 label_fn <- \(var){
   varname <- deparse(substitute(var))
   v <- labs[labs$field_name == varname,]
   v$label[match({{var}}, v$code_format)]
-  }
+}
 
 # function to produce table with % for one variable
 tbl_fn <- \(x){
@@ -87,324 +39,639 @@ tbl_fn <- \(x){
     tabyl() |> 
     adorn_totals() |> 
     adorn_pct_formatting() 
-  }
+}
 
 labs <- readxl::read_xlsx("../data/Road-Safety-Open-Dataset-Data-Guide.xlsx") |> clean_names() |> 
   ## recode NA values if missing 
   mutate(label = case_when(code_format == "-1" ~ NA,
                            str_detect(label, "nknown| self") ~ NA,
-                            .default = label),
+                           .default = label),
          code_format = as.numeric(code_format))
 accidents_raw <- read_csv("../data/dft-road-casualty-statistics-accident-2020.csv.xls")
 vehicles_raw <- read_csv("../data/dft-road-casualty-statistics-vehicle-2020.csv.xls")  
 casualties_raw <- read_csv("../data/dft-road-casualty-statistics-casualty-2020.csv.xls")
-```
 
-```{r}
+# clean accidents dataset  --------------------------------------------------------------
 accidents_clean <- accidents_raw |> 
-  # remove columns unlikely to be of use
-  select(-c(accident_index, accident_year, 
-            contains("loca"),
-            second_road_class, second_road_number,
-            first_road_number, police_force,
-            did_police_officer_attend_scene_of_accident)) |> 
+  # keep columns likely to be of use
+  select(accident_reference, date, time, speed_limit, accident_severity,  
+         road_surface_conditions, urban_or_rural_area, trunk_road_flag) |> 
   mutate(
     # recode missing data as NA
     across(where(is.numeric), ~na_if(.x, -1)),
     # add labels
-    across(c(junction_detail:trunk_road_flag, 
-             accident_severity, day_of_week,
-             first_road_class, road_type), label_fn), 
+    across(c(accident_severity:trunk_road_flag), label_fn), 
     # convert  date to date format
     date = dmy(date), 
     # recode fatal and severe as severe - set slight as reference group
     accident_severity = ifelse(accident_severity == "Slight", "Slight", "Severe") |> 
-           fct_relevel("Slight"),
+      fct_relevel("Slight"),
     # create categorical variable for time of accident
-    time_of_day = case_when(between(hour(time), 0, 6) ~ "night_off_peak",
-                      between(hour(time), 7,9) ~ "morning_peak", # 7-10AM
-                      between(hour(time), 10,15) ~ "day_off_peak",
-                      between(hour(time), 16,18) ~ "evening_peak",# 4-7PM
-                      between(hour(time), 19,23) ~ "night_off_peak"),
-    # should speed be factor or continuous variable?
-    speed_limit_cat = factor(speed_limit), 
+    time_of_day = case_when(
+      between(hour(time), 7,9) ~ "7-10am", 
+      between(hour(time), 10,15) ~ "10am-4pm",
+      between(hour(time), 16,18) ~ "4-7pm",
+      between(hour(time), 19,22) ~ "7-11pm",
+      .default = "11pm-7am")|> 
+      factor(levels =  c("7-10am", "10am-4pm", "4-7pm", "7-11pm", "11pm-7am")),
+    # road surface conditions to three categories - dry, wet and other
     road_surface_conditions = case_when(
       str_detect(road_surface_conditions, "Dry|Wet") ~ road_surface_conditions, 
       is.na(road_surface_conditions)~ NA,
-      .default = "Other"),
-    light_conditions = case_when(str_detect(light_conditions, "Dayl") ~ light_conditions,
-                       is.na(light_conditions) ~ NA,
-                       .default = "Darkness") |> fct_relevel("Daylight"),
-    weather_conditions = case_when(str_detect(weather_conditions, "Fine no") ~ "Fine",
-                         str_detect(weather_conditions, "Raining") ~ "Rain", 
-                         str_detect(weather_conditions, "Unkn") ~ NA, 
-                         is.na(weather_conditions) ~ NA,
-                         .default = "Other"), 
-    first_road_class = case_when(
-      str_detect(first_road_class, "M") ~ "Motorway",
-      str_detect(first_road_class, "A") ~ "A",
-      str_detect(first_road_class, "B|C") ~ "B/C",
-      .default = "Unclassified"), 
+      .default = "Other") |>  factor(),
     # small number of unallocated road - change to NA
     urban_or_rural_area = na_if(urban_or_rural_area, "Unallocated") |> 
       # set urban as referenec group
-      fct_relevel("Urban"))
-          
-glimpse(accidents_clean)
+      fct_relevel("Urban"),
+    trunk_road_flag = ifelse(trunk_road_flag == "Non-trunk", "Non-trunk", "Trunk") |> 
+      fct_rev()) |> 
+  rename(trunk_road = trunk_road_flag)
+
+
 ## check counts of variables 
-map(accidents_clean[, -c(1:3, 5:7, 9, 12)], tbl_fn)
-```
+map(accidents_clean[, -c(1:3)], tbl_fn)
 
-```{r}
-accidents_final <- accidents_clean |> 
-  select(-c(pedestrian_crossing_human_control, 
-            pedestrian_crossing_physical_facilities, 
-            special_conditions_at_site, junction_detail, 
-            junction_control, first_road_class, 
-            carriageway_hazards))
-```
-
-
-```{r}
 # clean_vehicles dataset -----------------------------------------------------
-vehicles_raw2 <- vehicles_raw |> 
-  relocate(c(age_of_driver, age_of_vehicle, 
-             generic_make_model,
-             engine_capacity_cc), .after = accident_reference) |> 
+vehicles_clean <- vehicles_raw |> 
+  select(accident_reference,age_of_vehicle, 
+         age_of_driver, vehicle_type,  sex_of_driver) |> 
   mutate(
     # recode missing data as NA
     across(where(is.numeric), ~na_if(.x, -1)),
-    across(c(vehicle_reference:driver_home_area_type ), label_fn))
-
-## check if correctly labelled 
-glimpse(vehicles_raw2)
-
-# check which variables are of use
-map(vehicles_raw2[, -c(1:7)], tbl_fn)
-```
-
-```{r}
-vehicles_clean <- vehicles_raw2 |> 
-  # select cols likely to be useful
-  select(accident_reference, age_of_driver, age_of_vehicle,
-         sex_of_driver, age_band_of_driver, vehicle_type) |> 
+    across(c(vehicle_type:sex_of_driver ), label_fn)) |> 
   # collapse vehicle type to fewer categories
   mutate(vehicle_type = case_when(
-           str_detect(vehicle_type, "car|Car") ~ "car",
-           str_detect(vehicle_type, "Van|Goods|Bus|bus") ~ "heavy_vehicle",
-           str_detect(vehicle_type, "Motor|motor") ~"motor",
-           .default = vehicle_type ) |> 
-           # lump to few categories and change to character for next steps
-           fct_lump(4) |> as.character(), 
-         # change unknown sex of drvier to NA
-         sex_of_driver = na_if(sex_of_driver, "Not known")) |> 
+    str_detect(vehicle_type, "car|Car") ~ "car",
+    str_detect(vehicle_type, "Van|Goods|Bus|bus") ~ "heavy_vehicle",
+    str_detect(vehicle_type, "Motor|motor") ~"motor",
+    str_detect(vehicle_type, "Pedal") ~"pedal_cycle",
+    .default = "other"), 
+    # change unknown sex of drvier to NA
+    sex_of_driver = na_if(sex_of_driver, "Not known")) |> 
   ## create single variable for each accident reference group
   group_by(accident_reference) |> 
   mutate(
     # minimum age of driver involved in accident
     # note: age of driver is NA for some vehicles 
     vehicle_driver_min_age = ifelse(any(!is.na(age_of_driver)), 
-                                 min(age_of_driver, na.rm = T), NA), 
+                                    min(age_of_driver, na.rm = T), NA), 
     # similarly identify maximum age of vehicle involved in accident
     vehicle_max_age = ifelse(any(!is.na(age_of_vehicle)), 
                              max(age_of_vehicle, na.rm = T), NA),
-    # check if male driver involved in accident
-    vehicle_male_driver = any(sex_of_driver == "Male"),
-    # check if female driver involved in accident
-    vehicle_female_driver = any(sex_of_driver == "Female"),
     # check if car involved and similar for other vehicle types
     vehicle_car = any(vehicle_type == "car"),
     vehicle_heavy = any(vehicle_type == "heavy_vehicle"), 
-    vehicle_other = any(vehicle_type == "Other"),
-    vehicle_motorcyle = any(vehicle_type == "motor"),
-    vehicle_pedal_cycle = any(vehicle_type == "Pedal cycle")) |> 
-  ungroup() 
-
-# check cleaned vehicles dataframe
-glimpse(vehicles_clean)
-# check which variable counts
-map(vehicles_clean[, -c(1:3, 7:8)], tbl_fn)
-```
-
-```{r}
-# create df with one row per accident 
-vehicles_distinct <- vehicles_clean |> 
-  select(-c(age_of_driver:vehicle_type)) |> 
+    vehicle_other = any(vehicle_type == "other"),
+    vehicle_motorcycle = any(vehicle_type == "motor"),
+    vehicle_pedal_cycle = any(vehicle_type == "pedal_cycle"),
+    # check if female driver involved in accident but not in pedal cycle or other vehicle
+    vehicle_female_driver = !vehicle_pedal_cycle & !vehicle_other & any(sex_of_driver == "Female"),
+    ## check if driver under 25 but not in pedal cycle or other vehicle
+    vehicle_driver_age_under_25 = !vehicle_pedal_cycle & !vehicle_other & vehicle_driver_min_age <26) |> 
+  ungroup() |> 
+  select(-c(age_of_vehicle:vehicle_driver_min_age)) |> 
   distinct()
 
 
+# check which variable counts
+map(vehicles_clean[, -c(1:2)], tbl_fn)
+
 # clean casualties dataset--------------------------------------------------------
-glimpse(casualties_raw)
+
 casualties_clean <- casualties_raw |> 
-  select(-accident_index, -accident_year) |> 
-  mutate(
-    # recode missing data as NA
-    across(where(is.numeric), ~na_if(.x, -1)),
-    across(c(casualty_class:casualty_imd_decile & !age_of_casualty), label_fn), 
-    # identify vehicle of casualty - to five categories
-    # car, cycle, pedestrian, motorcycle and all other vehicles
-    casualty_type2 = case_when(
-      str_detect(casualty_type, "Car|Cycl|Pede") ~ casualty_type, 
-      str_detect(casualty_type, "Motor") ~ "Motorcycle",
-      str_detect(casualty_type, "car") ~ "Car occupant",
-      .default = "All other vehicles")) |> 
+  select(accident_reference, casualty_type) |> 
+  mutate(casualty_type = label_fn(casualty_type), 
+         # identify vehicle of casualty - to five categories
+         # car, cycle, pedestrian, motorcycle and all other vehicles
+         casualty_type2 = case_when(
+           str_detect(casualty_type, "Car|Cycl|Pede") ~ casualty_type, 
+           str_detect(casualty_type, "Motor") ~ "Motorcycle",
+           str_detect(casualty_type, "car") ~ "Car occupant",
+           .default = "All other vehicles")) |> 
   group_by(accident_reference) |> 
   ## identify which category involved in each accident 
   mutate(casualty_cyclist = any(casualty_type2 == "Cyclist"),
          casualty_car_occupant = any(casualty_type2 == "Car occupant"),
          casualty_motorcycle = any(casualty_type2 == "Motorcycle"),
          casualty_pedestrian = any(casualty_type2 == "Pedestrian"),
-         casualty_other_vehicle = any(casualty_type2 == "All other vehicles"), 
-         casualty_min_age = ifelse(any(!is.na(age_of_casualty)), 
-                                   min(age_of_casualty, na.rm = T), NA)) |> 
-  ungroup()
-
-glimpse(casualties_clean)
-map(casualties_clean[, -c(1:3, 6, 23)], tbl_fn)
-
-casualties_distinct <- casualties_clean |> 
-  select(accident_reference, casualty_cyclist:casualty_min_age) |> 
+         casualty_other_vehicle = any(casualty_type2 == "All other vehicles")) |> 
+  ungroup() |> 
+  select(-casualty_type2, -casualty_type) |> 
   distinct()
-```
 
-```{r}
+
+map(casualties_clean[,-1], tbl_fn)
+
 # final dataframe ---------------------------------------------------------
-dat <- left_join(accidents_final, vehicles_distinct) |> 
-  left_join(casualties_distinct) |> 
-  mutate(across(where(is.character), factor),
-         across(where(is.logical), factor))
+dat <- left_join(accidents_clean, vehicles_clean) |> 
+  left_join(casualties_clean) |> 
+  mutate(
+    across(where(is.logical), ~ifelse(.x, "Yes", "No")),
+    across(where(is.character), factor),
+    speed_limit_squared = speed_limit^2) |> 
+  relocate(speed_limit_squared, .after = speed_limit)
 
 nrow(dat) == nrow(accidents_raw)
-```
 
-```{r}
 # EDA ---------------------------------------------------------------------
-glimpse(dat)
+
 # descriptive table for accidents 
 names(dat)
-(table1_vars <- names(dat[, -c(1:4,7,9, 16)]))
 
-table1 <- summary_factorlist(dat, "accident_severity", table1_vars, 
-                     include_row_missing_col = TRUE,
-                     na_include = TRUE, column = FALSE, 
-                     total_col = T, add_row_total = TRUE,
-                     cont = "median") 
-```
-
-```{r}
-# MVA ---------------------------------------------------------------------
-# remove some vars for MVA 
-# drop day of the week as probably not worthwhile 
-# keep trunk road instead of road type
-# keep speed limit as continuous 
-# keep light conditions instead of time of day 
-# keep road surface conditions instead of weather conditions
-# casualty_min_age probably not useful as children would come under pedestrians
-(mva_vars <- table1_vars[-c(3:4, 7, 10:12, 26)])
-
-## this take 2-3 minutes to run
-#table2 <- finalfit(dat, "accident_severity", mva_vars) 
- 
-# or you can do just MVA using glm function but it still takes 2-3 mins 
-#mod <- glm(reformulate(mva_vars, "accident_severity"),  family = binomial, dat)
-#mod_est <- broom::tidy(mod, exponentiate = T, conf.int = T) |> as.data.frame()
-#mod_est
-```
-
-```{r}
-vehicles_raw<-
-   vehicles_raw%>%
-   select(accident_reference, age_of_driver, sex_of_driver)%>%
-   filter(sex_of_driver != -1) %>%
-   filter(age_of_driver!= -1)%>%
-   mutate(male_u25 = case_when(age_of_driver <=25 & sex_of_driver==1 ~ 1, TRUE~0))%>%
-   group_by(accident_reference)%>%
-   summarise(male_u25 = max(male_u25))
-
-vehicles_raw
-
-dat <- merge(dat, vehicles_raw, by="accident_reference")
+(expl_vars1 <- names(dat)[-c(1:3,5:6)])
 ```
 
 
-```{r, echo=FALSE}
-junction_df<-
-  accidents_raw%>%
-  mutate(junction = case_when(junction_detail == 0 ~1, TRUE~0))%>%
-  select(junction, accident_reference)
+## Executive Summary
 
-dat <- merge(dat, junction_df, by="accident_reference")
-dat
-```
+The primary aim of this analysis is to determine the relationship between the severity of road traffic accidents in Great Britain and the speed limit in place where the accident occurred. Secondary aims include investigating the effects of road surface conditions, time of day, casualty type, maximum age of vehicles involved, and whether the drivers were under 25 years old on road accident severity. The analysis uses data on road traffic accidents which occurred in Great Britain in the year 2020. A logistic regression model was selected, to assess the odds of an accident being fatal or serious (as opposed to slight) depending on the speed limit in place, while controlling for demographic, environmental and other differences. The main finding was…….
+
+## Introduction
+
+According to the World Health Organisation, there are approximately 1.3 million fatalities globally each year due to road traffic accidents (1). Indeed, road traffic injuries are the primary cause of death for those aged between five and 29 years old (1). Although most deaths occur in low- to middle-income countries, it is nevertheless an issue of significant concern for high-income countries also.  
+It is well known that driving at an increased speed is related to both the risk of a road traffic accident and the severity of the accident, should it occur (1). However, there are a number of other factors that influence accident severity and these include factors such as drunk driving, speeding, younger drivers, proximity of vehicles and pedestrians, road conditions and the interaction between these factors.  
+
+An increased understanding of the impact of these factors on road accident severity could aid policymakers in decision making and be used to implement targeted preventative measures  enabling optimal use of finite resources and increasing road safety for all users. 
+
+It is difficult to identify and capture all factors that influence the severity of accidents. In Great Britain, the Department of Transport systematically collects and publishes data relating to accidents, the vehicles and casualties involved in those accidents. This dataset provides an opportunity to assess key factors associated with severity of accidents. The primary aim of this analysis is to determine the relationship between speed limits and the severity of road traffic accidents, adjusting for all other relevant factors. Secondary aims include investigating the effects of environmental, demographic and other factors on road accident severity. More specifically, the relationship between accident severity and road surface conditions, time of day, casualty type, maximum age of vehicles involved, and whether the drivers were under 25 years old, will be explored as secondary aims.
+
+Information on the data source and methods used to analyse the data will be provided in the subsequent Methods section. The Results section will present the main findings, including figures and tables. The Conclusions and Discussion section will elaborate on the findings and discuss the limitations of the analysis. 
+
+
+
+## Methods
+
+### Data Sources
+
+This retrospective analysis utilised road safety data for the year 2020, available online from the UK’s Department of Transport website (2). The dataset included details of road accidents that occurred on public roads in Great Britain, involving at least one vehicle and resulting in human injury. Information is available on the circumstances of the accident, such as weather conditions, time of day, visibility, speed limit, road type and surface conditions. In addition, data was available on the types of vehicles and characteristics of the casualties involved in these accidents which can be linked through a common accident reference number. We downloaded data on all accidents and the associated casualties and vehicles to create a single dataset.  Each accident was indicated by a unique reference number, which was also included in the vehicles and casualties dataset. Using the common accident reference number, the three datasets were linked. As a single accident could be associated with multiple casualties and vehicles, we used various conditions to identify and summarise key factors for each accident. The final dataset contains complete information on the vehicles and accidents in one row for each accident. 
+
+
+### Selection of variables
+The outcome variable for this analysis was accident severity. The available data reports accident severity as fatal, serious or slight. For this analysis, the fatal and serious groups were combined, so that accidents were divided into two categories: ‘fatal or serious’ and ‘slight’. 
+
+In addition, a subset of the other available variables were extracted from the datasets, based on their potential to impact accident severity.  These factors include the following: 
+
+- Speed limit (accidents dataset): Speed limit of the road where the accident occurred was recorded in miles per hour.  Data on the speed of vehicles involved in the accidents were not available in the dataset. 
+- Road surface conditions (accidents dataset): The dataset provided seven categories of road surface conditions. Given the small number of observations for certain categories, we collapsed this variable to three categories -  “dry”,  “wet/damp” and “other”. The “other” category included conditions such as snow, frost or ice, flood, oil or diesel and mud on the road.
+- Time of day (accidents dataset): The time when the accident occurred was recorded in 24 hour format.  To allow easy interpretation, we classified the time of accident into five categories of  7-10am(morning peak), 10am-4pm (day off peak), 4-7pm (evening peak), 7-11pm (evening off peak) and 11pm to 6am (night time). 
+- Urban/rural (accident dataset): All accidents were recorded as having occurred in an urban or rural area. 
+- Trunk road (accident dataset): roads maintained by the Highways Agency were recorded as trunk roads with all other roads designated as non-trunk roads. 
+- Casualty type (casualty dataset): Type of casualty refers to the method of transport that the casualty was using at the time of accident. For each accident, we collapsed the casualty to one of five categories - car occupant, cyclist, motorcyclist, pedestrian  and all other vehicles.  Given that each accident may have multiple casualties, we created five variables for these categories for the accident reference number and the types of casualties were coded as a “Yes” or “No”  for that casualty type. 
+- Vehicle type (vehicle dataset):Type of vehicle refers to the method of transport that was involved in the accident. For each accident, we assigned the vehicle type to  five categories - car, heavy vehicles, pedal cyclist, motorcyclist,  and other vehicles.  Given that each accident may have multiple vehicles, we created five variables for these categories for the accident reference number and the types of vehicles were coded as a “Yes” or “No”  for that vehicle type.
+- Minimum age of driver (vehicle dataset): As accidents often involve multiple vehicles and drivers, we identified if any single vehicle driver was under 25 years old as long as the vehicle was not a pedal cycle or other vehicle.
+- Gender of the driver (vehicle dataset): The gender of the driver involved in an accident is recorded. Gender was coded as “Yes” if a female driver was present.
+The maximum age of a vehicle (vehicle dataset):  For each accident, we chose the maximum age in years of the vehicle(s) involved. 
+For all variables, we classified “not available”, “not recorded”,  “unknown” or other such values as missing data. 
+
+
+###Statistical analysis
+
+After data cleaning and checks, we conducted exploratory data analysis and produced 2x2 tables and plots to describe the data.  Speed limit and maximum age of the vehicle were kept as continuous variables. All other variables were included as nominal variables.  A statistical method called logistic regression was used to assess the influence of different factors on the risk of severe accidents. This method was chosen because it allows the assessment of the relationship between a binary outcome (severe accident or not) and potential factors that may increase or decrease the risk of the outcome. After checking that the model was appropriate for interpretation, we calculated the predicted probability of an accident being severeoutcome for the various factors.   
+
+
+
 
 ## Results
 
-### Graphs
+In 2020, there were 91199 recorded accidents, involving  167374 vehicles and resulting in 115584 casualties.  Among the recorded accidents, 21.6% (19,746) were classified as being severe. 
 
-Description and text to follow, linking to eventual regeression
-
-```{r}
-#mean_data_points()
-
-ggplot(data = dat, aes(x=factor(accident_severity), y=speed_limit))+
-  geom_boxplot()+
-  stat_summary(fun.y=mean, color='red', shape='diamond')+
-  xlab('Accident Severity')+
-  ylab('Speed Limit (Miles per Hour)')+
-  labs(title= 'The speed limit in place tends to be higher for fatal or serious accidents compared to slight accidents',
-  subtitle='Boxplot of speedlimit versus accident severity. The red diamond indicates the mean speed limit in place for each accidnent severity category')
-```
+Among accidents, the highest number of slight and severe outcomes were recorded in roads with a 30 miles per hour (mph) speed limit (Figure 1).  However, the proportion of severe accidents increased with increasing speed limit, with the highest proportion recorded at 60mph. 
 
 ```{r}
-dat <-
+dat_bar <-
   dat %>%
   mutate(numeric_sev = case_when(accident_severity == 'Slight' ~0,
                                  accident_severity == 'Severe' ~1))%>%
   drop_na()
 
-ggplot(data=dat, aes(x=factor(speed_limit), y= numeric_sev))+
+ggplot(data=dat_bar, aes(x=factor(speed_limit), y= numeric_sev))+
   geom_bar(stat='summary', fun.y=mean, fill='indianred2')+
   ylab('Proportion of Accidennts that are Fatal or Serious')+
   xlab('Speed limit (miles per hour')+
   labs(title = 'The proportion of serious or fatal accidents increases with increasign speed limit, with the exception of 70 miles per hour speed limit', subtitle='Bar graph of speed limit versus proportion of fatal or severe accidents')
 ```
-Plot is static and needs implementing in rmarkdown
-
-![timeOfDay](../static/unnamed-3.png)
-
-### Regression Model
-
-In this analysis we use a specific type of regression analysis for binary outcomes called a logistic regression. 
-
-In addition we have included more than one variable, creating a multiple regression. This allows us to "control" for variables.
-
-- Provide better explanation as to what a logistic and multiple regression is and why it is appropriate
-- Explain in semi-lay terms how to interpret the results/coefficents (
-exponentiate for odds?)
-- Discuss the "significance" 
-```{r,  results = TRUE}
-# dat$road_surface_conditions
-# dat$speed_limit
-# dat$time_of_day
-# dat$casualty_pedestrian
 
 
-mdl <- glm(
-  accident_severity~
-    speed_limit + factor(road_surface_conditions) + 
-    factor(time_of_day)+casualty_pedestrian+
-    male_u25+junction, family = binomial(), data = dat)
 
-mdl_summary <- summary(mdl)
-mdl_summary
+```{r, results =TRUE}
+table1 <- summary_factorlist(dat, "accident_severity", expl_vars1, 
+                             na_include = TRUE, column = FALSE, 
+                             total_col = T, 
+                             cont = "median") |> 
+  mutate(label = gsub("_", " ", label) |> str_to_sentence(),
+         Total = gsub("(100)", "", Total, fixed = T)) |> 
+  rename(Variable = label)
+
+# TODO - Remove
+knitr::kable(table1)
+```
+The majority of accidents take place in urban areas. However, the proportion of accidents that are severe is higher in rural areas compared to that in urban areas. 27.8% of accidents that occur in rural areas are severe compared to 18.7% of accidents that occur in urban areas. 
+
+86.9% of all accidents occurred on non-trunk roads. When examining the proportion of accidents that are severe, there is almost an equal distribution between trunk (21.3%)  and non-trunk (20.7%) roads when considering whether an accident is severe.
+
+When considering road surface conditions, it can be seen that 97.5% of accidents occur on either dry or wet road conditions.  21.7% of accidents that occur in dry conditions are severe, whereas 22% of accidents occurring in wet/damp conditions are severe.
+
+It can be seen that the majority of accidents occur during the day, with 10am-4pm having the highest amount of accidents. However, the highest proportion of severe accidents happened during the night (11pm-7am). 27.4% of night accidents were severe as opposed to 18.8% of early morning accidents. 
+
+The median and interquartile ranges have been calculated for the maximum age of a vehicle involved in an accident. It was found that both severe and slight accidents have the same median value of 10 years and interquartile range of 5-14 years. 
+comment about driver gender, driver age.
+
+
+
+It can also be observed that although there are missing data for all categories, they constitute only a very small percentage of the observations. This will allow us to make inferences whilst having confidence in our supporting data.
+
+
+Cars were involved in the majority of accidents and had the highest number of slight and severe outcomes (Figure 2). However, the proportion of severe outcomes was highest for motorcycle and pedal cycles. 
+
+```{r}
+
+## accidents by speed limit 
+a <- dat |> 
+  drop_na(speed_limit) |> 
+  ggplot() + 
+  geom_bar(aes(factor(speed_limit), fill = accident_severity), position = "dodge") +
+  labs(x = "Speed limit (mph)", y = "Number of accidents", 
+       fill = "Accident severity")+
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  theme_classic()
+
+b <- dat |> 
+  drop_na(speed_limit) |> 
+  ggplot() + 
+  geom_bar(aes(factor(speed_limit), fill = accident_severity), position = "fill") +
+  labs(x = "Speed limit", y = "Proportion of accidents", 
+       fill = "Accident severity" ) +
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  theme_classic()
+
+a + b+ plot_layout(guides = "collect") & theme(legend.position = 'top')
+
+
+## vehicles involved in accidents
+vehicle_dat <- dat |> 
+  select(accident_reference, accident_severity, 
+         vehicle_car:vehicle_pedal_cycle) |> 
+  pivot_longer(!c(accident_severity, accident_reference), names_to = "vehicle",
+               names_pattern = "_(.*)") |> 
+  filter(value == "Yes") |> 
+  mutate(vehicle = case_match(vehicle,
+                              "car" ~ "Car",
+                              "heavy" ~ "Heavy vehicle",
+                              "motorcycle" ~ "Motorcyle",
+                              "other" ~ "Other vehicle",
+                              "pedal_cycle" ~ "Pedal cycle") |> 
+           fct_infreq()) 
+
+d <- ggplot(vehicle_dat) +
+  geom_bar(aes(vehicle, fill = accident_severity), position = "dodge") +
+  labs(x = "Vehicle type", y = "Number of accidents", 
+       fill = "Accident severity")+
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  theme_classic()
+
+e <- ggplot(vehicle_dat) +
+  geom_bar(aes(vehicle, fill = accident_severity), position = "fill") +
+  labs(x = "Vehicle type", y = "Number of accidents", 
+       fill = "Accident severity")+
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  theme_classic()
+
+d + e+ plot_layout(guides = "collect") & theme(legend.position = 'top')
 ```
 
 
 ```{r}
-exp(mdl_summary$coefficients[,1]["speed_limit"])
+
+
+## casualties involved in accidents 
+casualty_dat <- dat |> 
+  select(accident_reference, accident_severity, 
+         casualty_cyclist:casualty_other_vehicle) |> 
+  pivot_longer(!c(accident_severity, accident_reference), names_to = "casualty",
+               names_pattern = "_(.*)") |> 
+  filter(value == "Yes") |> 
+  mutate(casualty = case_match(casualty,
+                               "car_occupant" ~ "Car occupant",
+                               "cyclist" ~ "Cyclist",
+                               "motorcycle" ~ "Motorcyle rider",
+                               "other_vehicle" ~ "Other vehicle occupant",
+                               "pedestrian" ~ "Pedestrian") |> 
+           fct_infreq()) 
+
+f <- ggplot(casualty_dat) +
+  geom_bar(aes(casualty, fill = accident_severity), position = "dodge") +
+  labs(x = "Casualty type", y = "Number of accidents", 
+       fill = "Accident severity")+
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  theme_classic()
+
+g <- ggplot(casualty_dat) +
+  geom_bar(aes(casualty, fill = accident_severity), position = "fill") +
+  labs(x = "Casualty type", y = "Number of accidents", 
+       fill = "Accident severity")+
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  theme_classic()
+
+f+ g+ plot_layout(guides = "collect") & theme(legend.position = 'top')
 ```
 
 
-## References 
+```{r}
+# MVA ---------------------------------------------------------------------
+
+null_model <- glm(accident_severity ~1, family = binomial, dat)
+mod1 <- glm(reformulate(expl_vars1, "accident_severity"), family = binomial, dat)
+
+## pseudo-R squared - for explanatory power - 34%
+(logLik(null_model)-logLik(mod1))/logLik(null_model)
+
+## model fit - ok!
+pchisq(deviance(mod1),mod1$df.residual, lower.tail = F)
+
+## check if quadratic term needed for speed limit
+mod2 <- update(mod1, .~. + speed_limit_squared)
+
+lrtest(mod1, mod2) # needed
+
+## check if cubic term needed for speed limit
+mod3 <- update(mod2, .~. + I(speed_limit^3))
+lrtest(mod2, mod3) # not needed 
+
+## quadratic term for vehicle max age 
+mod4 <- update(mod2, .~. + I(vehicle_max_age^2))
+lrtest(mod2, mod4) # not needed as P> 0.05
+
+# get lrt p-values
+x <- drop1(mod2, test = "Chi") 
+lrt_p <- tibble(Variable = rownames(x), 
+                lrt = p_tidy(x$`Pr(>Chi)`, digits = 3, prefix = NULL)) |> 
+  slice(3:20)
+
+(expl_vars2 <- names(dat)[-c(1:3,6)])
+
+## create table with unvariable and multivariable odds ratios 
+## this takes 2-3 minutes to run
+table2 <- finalfit(dat, "accident_severity", expl_vars2)
+
+mva_clean <- table2 |> 
+  ff_remove_p() |> 
+  rename(Variable = `Dependent: accident_severity`) |> 
+  select(-Slight,  -Severe) |> 
+  left_join(lrt_p, join_by(Variable)) |> 
+  mutate(Variable = gsub("_", " ", Variable), 
+         `OR (univariable)` =  ifelse(`OR (univariable)` == "-", "Reference", `OR (univariable)`), 
+         `OR (multivariable)` =  ifelse(`OR (multivariable)` == "-", "", `OR (multivariable)`),
+         lrt = replace_na(lrt, "")) |> 
+  #fill(lrt, .direction = "down") |> 
+  rename(Levels = " ", 
+         "LRT p-value" = lrt) |> 
+  mutate(Variable = gsub("_", " ", Variable) |> str_to_sentence(),
+         Levels = case_when(Variable == "Speed limit" ~ "Linear",
+                            Variable == "Speed limit squared" ~ "Quadratic",
+                            .default = Levels),
+         Variable = gsub("Speed limit squared", "", Variable))  
+
+# TODO - We were dissuaded from using odds ratios
+#kbl(mva_clean) %>%
+#  kable_styling(bootstrap_options = c("striped", "hover")) 
+
+```
+
+```{r}
+## this takes 2-3 minutes to run  
+# tidy_mod <-  broom::tidy(mod2, exponentiate = T, conf.int = T) 
+# 
+# ## odds ratio plot
+# tidy_mod |> 
+#   filter(!str_detect(term, "Inter|limit")) |> 
+#   mutate(term = tolower(term) %>% 
+#            gsub("_", " ", .) %>%
+#            gsub("day", "day: ", .) %>%
+#            gsub("tions", "tions: ", .) %>%
+#            gsub("alty", "alty: ", .) %>%
+#            gsub("road", "road: ", .) %>%
+#            gsub("area", "area: ", .) %>%
+#            gsub("^vehicle", "vehicle: ", .) %>%
+#            gsub("yes", "", ., fixed = T) |> 
+#            str_to_sentence() |> 
+#            fct_reorder(estimate)) |> 
+#   ggplot(aes(y = term)) +
+#   geom_point(aes(x = estimate,color = ifelse(estimate>1,  "violetred4","palegreen4")), size = 2) +
+#   geom_errorbar(aes(xmin = conf.low, xmax = conf.high, 
+#                     color = ifelse(conf.low>1, "violetred4","palegreen4")), width = 0.3) +
+#   scale_x_continuous(trans = 'log2',
+#                      limits = c(0.125, 16),
+#                      breaks = c(0.125, 0.25, 0.5, 1, 2, 4, 8, 16),
+#                      labels = function(x) sprintf("%g", x)) +
+#   scale_color_identity()+
+#   labs(x = "Adjusted odds ratio", y = NULL)+
+#   geom_vline(xintercept = 1, linetype = "solid", color = "blue")+
+#   theme_minimal()
+
+```
+
+```{r}
+# 
+# # predicted probabilities  ------------------------------------------------
+# dat2 <- dat |> 
+#   select(all_of(expl_vars2), accident_severity) |> 
+#   drop_na() |> 
+#   ## add predicted probabilities 
+#   mutate(fit = (predict(mod2, type = "link", se = T))$fit,
+#          se = (predict(mod2, type = "link", se = T))$se.fit,
+#          predicted = plogis(fit),
+#          lci = plogis(fit - (qnorm(0.975) * se)),
+#          uci = plogis(fit + (qnorm(0.975) * se)),
+#          accident_severity = as.numeric(accident_severity)-1)
+# 
+# ## create table of probabilities for all variables
+# prob_fn <- \(var){
+#   lbl <- gsub("_", " ", var) |> str_to_sentence()
+#   var <- sym(var)
+#   dat2 |>
+#     summarise(p = mean(predicted), 
+#               lci = mean(lci),
+#               uci = mean(uci), .by = var) |> 
+#     rename("Levels" = 1) |> 
+#     mutate(Levels = as.character(Levels))
+# }
+# 
+# 
+# prob_table <- expl_vars2[-c(2,7)] |> 
+#   set_names() |> 
+#   map_dfr(.x = _, prob_fn, .id = "Variable") |> 
+#   mutate( Levels = ifelse(Variable == "speed_limit", paste(Levels, "mph"), Levels),
+#           Variable = ifelse(duplicated(Variable), "", Variable), 
+#           across(where(is.numeric), ~round(.x,2)),
+#           Variable = tolower(Variable) %>% 
+#             gsub("_", " ", .) %>%
+#             str_to_sentence()) |> 
+#   transmute(Variable, Levels, Probability = p, 
+#             "Confidence interval" = paste0(lci, "-", uci))
+# 
+# 
+# kbl(prob_table) %>%
+#   kable_styling(bootstrap_options = c("striped", "hover")) 
+```
 
 
+```{r}
+
+
+
+# ## plot probabilities for all other variables
+# gg <- \(var){
+#   lbl <- gsub("_", " ", var) |> str_to_sentence()
+#   var <- sym(var)
+#   dat2 |>
+#     summarise(p = mean(predicted), 
+#               lci = mean(lci),
+#               uci = mean(uci), .by = var) |> 
+#     ggplot() +
+#     geom_point(aes_string(var, "p", color = var), size = 3) +
+#     geom_errorbar(aes_string(var, ymin = "lci", ymax = "uci", color = var), width = 0.05, linewidth = 1) +
+#     theme_classic() +
+#     theme(legend.position = "none")+
+#     labs(x = lbl, y = "Predicted probability")
+# }
+# 
+# pred_list <- map(expl_vars2[-c(1,2,7)], gg)
+# 
+# ## show important ones only in main report 
+# wrap_plots(pred_list[c(2,4,10, 5, 8:9,12, 14, 15)], nrow = 3, ncol = 3)
+
+## all discrete variables 
+#wrap_plots(pred_list[1:9], nrow = 3, ncol = 3)
+#wrap_plots(pred_list[10:16], nrow = 3, ncol = 3)
+```
+
+
+```{r}
+# Baseline dataset
+speeds <- seq(20,70,1)
+locations <- c("Urban", "Rural")
+trunk <- c("Non-trunk", "Trunk")
+time_period <- c("7-10am", "10am-4pm", "4-7pm", "7-11pm", "11pm-7am") 
+
+new_data_facet <- expand.grid('speed_limit' = speeds, 
+                              'urban_or_rural_area' = locations,
+                              'trunk_road' = trunk, 
+                              'time_of_day' = time_period)
+
+n_samples <- length(new_data_facet)
+
+baseline_cols <- list(
+  road_surface_conditions = rep("Dry", n_samples), #
+  vehicle_max_age = rep(5, n_samples), #
+  vehicle_car = rep('No', n_samples), #
+  vehicle_heavy = rep('No', n_samples),#
+  vehicle_other = rep('No', n_samples),#
+  vehicle_motorcycle = rep('No', n_samples),#
+  vehicle_pedal_cycle = rep('No', n_samples),#
+  vehicle_female_driver = rep('No', n_samples),
+  vehicle_driver_age_under_25 = rep('No', n_samples),
+  casualty_pedestrian = rep('Yes', n_samples),
+  casualty_cyclist= rep('No', n_samples),
+  casualty_car_occupant= rep('No', n_samples),
+  casualty_motorcycle= rep('No', n_samples),
+  casualty_other_vehicle = rep('No', n_samples)
+)
+
+new_data_facet <- cbind(new_data_facet, baseline_cols)
+
+new_data_facet<- 
+  new_data_facet%>%
+  mutate(speed_limit_squared = speed_limit^2)%>%
+  mutate(prob=predict(mod2, newdata = ., type='response'))
+
+ggplot(new_data_facet) +
+  geom_line(aes(x=speed_limit, y=prob, color=urban_or_rural_area))+
+  facet_grid(time_of_day ~ trunk_road)
+```
+
+
+```{r}
+# Baseline dataset
+speeds <- seq(20,70,1)
+age<-seq(0,30,1)
+new_data_heat <- expand.grid(speed_limit=speeds, vehicle_max_age= age)
+n_samples <- nrow(new_data_heat)
+
+baseline_cols <- list(
+  time_of_day = rep("10am-4pm", n_samples), 
+  trunk_road = rep("Trunk", n_samples), 
+  road_surface_conditions = rep("Dry", n_samples),
+  urban_or_rural_area = rep("Rural", n_samples), 
+  vehicle_car = rep('No', n_samples), #
+  vehicle_heavy = rep('No', n_samples),#
+  vehicle_other = rep('No', n_samples),#
+  vehicle_motorcycle = rep('No', n_samples),#
+  vehicle_pedal_cycle = rep('No', n_samples),#
+  vehicle_female_driver = rep('No', n_samples),
+  vehicle_driver_age_under_25 = rep('No', n_samples),
+  casualty_pedestrian = rep('No', n_samples),
+  casualty_cyclist= rep('No', n_samples),
+  casualty_car_occupant= rep('No', n_samples),
+  casualty_motorcycle= rep('No', n_samples),
+  casualty_other_vehicle = rep('No', n_samples)
+)
+
+new_data_heat <- cbind(new_data_heat, baseline_cols)
+
+new_data_heat<- 
+  new_data_heat%>%
+  mutate(speed_limit_squared = speed_limit^2)%>%
+  mutate(prob=predict(mod2, newdata = ., type='response'))
+
+ggplot(new_data_heat) +
+  geom_tile(aes(x=speed_limit, y=vehicle_max_age, fill=prob))
+```
+
+
+
+
+## Conclusions and discussion
+
+We found that there were over 90,000 accidents reported in 2020, of which around fifth were classified as severe accidents. This high figure illustrates the potentially avoidable burden of death and injury caused by accidents on British roads. 
+
+This analysis has demonstrated that speed limit had an important role in the severity of accidents.  The probability of a severe accident increased steadily from 16% (15-17%) at roads with 20mph to 31%(29-33%) at 60mph, falling slightly to 24% (22-26%) for roads with 70 mph limit. The reduction in probability of fatal or severe accidents roads with 60 miles per hour speed limit to 70 miles per hour speed limit could be explained by the fact that the 70 miles per hour speed limit is only in place on motorways and dual-carriageways, which may have fewer pedestrians or cyclists compared to other road types, thus reducing the severity of accidents. 
+
+Whilst the risk of severe accidents is higher with increased speed, it is important to note that roads with 30 miles per hour had the highest number of recorded accidents. 
+
+The risk of severe accidents was higher in rural areas (27%, 95% CI: 25-29%) compared to urban areas (19%, 95% CI:18-20%).  Whilst we did not study the reasons for this difference, possible explanations include drivers driving at increased speed, reduced police presence, or the poorer quality of roads in more rural areas. 
+
+Regarding time of day when accidents occur, we found that the probability of an accident being fatal or severe was highest (28%, 95% CI: 26-30%) at night times (11pm-6am). This could be due to a number of factors such as driver fatigue, drink-driving or reduced visibility due to darkness. Evening peak (4pm - 7pm) was associated with a slight increase in the risk compared to daytime off peak (10am - 4pm). Morning peak hours (7am - 10am) were associated with the lowest risk of severe accidents (19%, 95% CI:18-21%).
+
+This study did not find evidence that the probability of an accident being severe differs for road surface conditions. The probability of an accident being severe in dry conditions was 22% (20-23%), 21% (20-23%) for wet/damp. The risk is similar, 21% (18-24%), for “other” road surface conditions, which included conditions of ice and snow amongst others. This unexpected finding may be explained by drivers exercising increased caution during conditions of ice or snow.
+
+According to the model, the age of the car involved has a significant effect on whether the accident is classed as severe or not. Furthermore, older cars have greater odds of being involved in a severe accident. In fact, for every year older a car gets, the odds of a severe accident increase by 1%. Perhaps this is due to older cars having less safety features. Modern cars are much safer due to having improved crumple zones, improved airbags and electronic safety systems (the car investor.com)
+
+As you might expect, if a cyclist is involved in an accident then this increases the odds of the accident being severe by nearly five times. Generally, cyclists don't have much protection other than a helmet so they are vulnerable on the roads. Interestly, they have a higher odds of being involved in a severe accident than a pedestrian or a motorcyclist. 
+
+When compared with pedestrians, it's possible that cyclists have a greater risk on the roads, because they are travelling at speed and they have access to roads with faster speed limits. Cyclists can ride on dual carriageways where cars travel at up to 70mph, whereas predominantly pedestrians are restricted to walking next to roads with speed limits of up to 30mph. Furthermore, cyclists are on the actual road with the cars and pedestrians are on the pavement. 
+
+In the model, Motorcyclists have a smaller odds of being involved in a severe accident compared to cyclists. This could be because motorcyclists wear much more protection than regular cyclists. 
+
+In an accident, there is very strong evidence that when a casualty occurs in one vehicle, there is a higher odds of having casualties in other vehicles as well.
+
+There is no evidence to suggest that the presence of a passenger affects the odds of the accident being severe. All modern cars are fitted with passenger airbags and have sophisticated crumple-zones which ensures passengers are well protected in the event of a crash. 
+
+The limitations of this study must be noted. First, important factors such as speeding, drunk driving and other driving and pedestrian behaviour related issues were not assessed as data were not available. Therefore, the various factors assessed in this study provide a partial explanation of the reasons for accidents. Nevertheless, this comprehensive analysis of all accidents in Great Britain has produced important findings. 
+
+## Technical Appendix
+
+After creating a single dataset that combined all three datasets, the variables speed limit and maximum age of the vehicle were continuous variables and all other variables were converted to factor variables.  As part of exploratory data analysis, the numbers of accidents across various categories and proportions of missing data were assessed.   The number of accidents, casualty type and vehicle type were plotted against the outcome variable. We also reviewed contingency tables for each variable against the outcome to ensure that there were adequate numbers of observations in each cell for fitting a logistic regression model.  
+
+A multivariable logistic regression model was built with all explanatory variables described in the methods. We tested for non-linearity of continuous variables (speed limit and maximum age of vehicle) against the outcome.  For speed limit, including a quadratic term improved model fit (as assessed by Likelihood Ratio test p-value <0.001). Adding a cubic term for speed limit did not improve model fit (LRT p-value>0.05).  For maximum age of vehicle,  adding a quadratic term did not improve model fit (LRT p-value >0.05).  Goodness of fit  was assessed and calculated pseudo R-squared value. In addition, we tested for significance of individual factors in improving model fit using Likelihood Ratio Test by comparing with and without each variable that was assessed. Although two variables had LRT p-value >0.05, we decided to retain all explanatory variables in the final model. The final model contained all factor variables, linear and quadratic functions of speed limit and linear function of maximum age of vehicle as continuous variables. The final model was based on 65, 624 complete observations. Finally, we calculated the predicted probabilities (with 95% confidence intervals) of outcome for the dataset based on the final model and plotted these for key factors of interest. All analysis were conducted in R (R Foundation for Statistical Computing, Vienna, Austria).  For the primary analysis, we used tidyverse, janitor, finalfit and patchwork packages. 
+
+For the shiny app, we specified a baseline model with reference group values for all factor variables and five years for maximum age of the vehicle. The baseline model could be shown on the probability plot based on user preference.  The probability plot is updated based on the parameter options chosen by the user. 
+
+
+## To do 
+
+- Check and verify supplied scripts
+- Probit vs logit, etc
+- LRT for model comparion, are we following Kostas method to arrive at the conclusion
+- "adjusting for all other relevant factors" (remove all)
+- We should explicitally handle NaNs
+- Is there a definition for ‘fatal or serious’ and ‘slight’
