@@ -1,15 +1,13 @@
 ---
-title: "An investigation of the relationship between speed limit and demographic, environmental and other factors on road accident severity in Great Britain."
+title: "An investigation of the relationship between speed limit and demographic, environmental and other factors on road accident severity in Great Britain"
 author: "Group 7 - 220249380, 220250364, 220247799, 220209410, 220256207"
-date: "18/03/2023"
+date: "19th March 2023"
 output:
   pdf_document: default
   html_document: default
 bibliography: references.bib
 csl: ieee.csl
 ---
-
-keywords: Accident Severity, Speed Limit, Road Safety, Demographic, Environmental,Spatial
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, results = FALSE, warning = FALSE, message = FALSE)
@@ -248,19 +246,17 @@ a <- dat |>
   drop_na(speed_limit) |> 
   ggplot() + 
   geom_bar(aes(factor(speed_limit), fill = accident_severity), position = "dodge") +
-  labs(x = "Speed limit (MPH)", y = "Number of accidents", 
+  labs(x = "Speed limit (mph)", y = "Number of accidents", 
        fill = "Accident severity")+
-  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
-  theme(axis.title.y = element_blank())
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) 
 
 b <- dat |> 
   drop_na(speed_limit) |> 
   ggplot() + 
   geom_bar(aes(factor(speed_limit), fill = accident_severity), position = "fill") +
-  labs(x = "Speed limit (MPH)", y = "Proportion of accidents", 
+  labs(x = "Speed limit (mph)", y = "Proportion of accidents", 
        fill = "Accident severity" ) +
-  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
-  theme(axis.title.y = element_blank())
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) 
 
 ## vehicles involved in accidents
 vehicle_dat <- dat |> 
@@ -277,17 +273,22 @@ vehicle_dat <- dat |>
                               "pedal_cycle" ~ "Pedal cycle") |> 
            fct_infreq()) 
 
+labels <- scale_x_discrete(labels=c("Car", 'Bicycle', 'Heavy \n Vehicle', 'Motorcycle',
+                             'Other'))
+
 d <- ggplot(vehicle_dat) +
   geom_bar(aes(vehicle, fill = accident_severity), position = "dodge") +
   labs(x = "Vehicle type", y = "Number of accidents", 
        fill = "Accident severity")+
-  scale_fill_manual(values = c( "palegreen3", "violetred4")) 
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  labels
 
 e <- ggplot(vehicle_dat) +
   geom_bar(aes(vehicle, fill = accident_severity), position = "fill") +
   labs(x = "Vehicle type", y = "Proportion of accidents", 
        fill = "Accident severity")+
-  scale_fill_manual(values = c( "palegreen3", "violetred4")) 
+  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
+  labels
 
 ## casualties involved in accidents 
 casualty_dat <- dat |> 
@@ -304,32 +305,36 @@ casualty_dat <- dat |>
                                "pedestrian" ~ "Pedestrian") |> 
            fct_infreq()) 
 
+
+labels <- scale_x_discrete(labels=c("Car \n occupant", 'Cyclist', 'Pedestrian', 'Motorcylist',
+                             'Other'))
+
 f <- ggplot(casualty_dat) +
   geom_bar(aes(casualty, fill = accident_severity), position = "dodge") +
   labs(x = "Casualty type", y = "Number of accidents", 
        fill = "Accident severity")+
-  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
-  theme(axis.title.y = element_blank())
+  scale_fill_manual(values = c( "palegreen3", "violetred4"))+
+  labels
 
 g <- ggplot(casualty_dat) +
   geom_bar(aes(casualty, fill = accident_severity), position = "fill") +
   labs(x = "Casualty type", y = "Number of accidents", 
        fill = "Accident severity")+
-  scale_fill_manual(values = c( "palegreen3", "violetred4")) +
-  theme(axis.title.y = element_blank())
+  scale_fill_manual(values = c( "palegreen3", "violetred4"))+
+  labels
 ```
 
-```{r, fig.width=7.5,fig.height=4, fig.cap="Relationship between speed limit and accident severity, Great Britain, 2020"}
+```{r, fig.width=8,fig.height=4, fig.cap="Left - Number of severe and slight causalties from accidents by speed limit. Right - Proportion of Severe accidents by speed limit. The risk of severe accident appears to increase with speed until 60mph, after which risk appears to reduce."}
 a + b +  plot_layout(guides = "collect", nrow=1) & theme(legend.position = 'top')
 ```
 
 
-```{r, fig.width=7.5,fig.height=4, fig.cap="Cars were involved in the majority of accidents and had the highest number of slight and severe outcomes (Figure 2). However, the proportion of severe outcomes was highest for motorcycle and pedal cycles."}
+```{r, fig.width=8,fig.height=4, fig.cap="Cars were involved in the majority of accidents and had the highest number of slight and severe outcomes (Figure 2). However, the proportion of severe outcomes was highest for motorcycle and pedal cycles."}
 d + e +  plot_layout(guides = "collect", nrow=1) & theme(legend.position = 'top')
 ```
 
 
-```{r, fig.width=7.5,fig.height=4, fig.cap="Similarly, the number of slight and severe casualties was highest for car occupants (figure 3) but the proportion of severe outcomes was highest for motorcyclists, pedestrians and cyclists. "}
+```{r, fig.width=8,fig.height=4, fig.cap="Similarly, the number of slight and severe casualties was highest for car occupants (figure 3) but the proportion of severe outcomes was highest for motorcyclists, pedestrians and cyclists. "}
 f + g +  plot_layout(guides = "collect", nrow=1) & theme(legend.position = 'top')
 ```
 
@@ -342,9 +347,10 @@ table1 <- summary_factorlist(dat, "accident_severity", expl_vars1,
                              cont = "median") |> 
   mutate(label = gsub("_", " ", label) |> str_to_sentence(),
          Total = gsub("(100)", "", Total, fixed = T)) |> 
-  rename(Variable = label)
+  rename(Variable = label)%>%
+  rename(Levels = levels)
 
-caption = "Characteristics of accident related variables by severity, Great Britain, 2020"
+caption = "Characteristics of accident related variables by severity, Great Britain, 2020. For dicrete characteristics counts are given with percentage proportions indicated in brackets. For continuous variables (speed and vehicle age) median values are provided, with the Inter Quartile Range (IQR) given in brackets."
 
 knitr::kable(table1, caption = caption)
 ```
@@ -428,7 +434,7 @@ lrt_p <- tibble(Variable = rownames(x),
 Table: Results of fitted logistic regression model.
 
 
-```{r, fig.cap="Plot showing the change in predicted probability of a severe accident at different speed limits. The plot demonstrates that the chance of a severe accident occurring generally increases for an increase in speed limit, other than at 70mph. More information about this can be found in the discussion section."}
+```{r, fig.cap="Plot showing the change in predicted probability of a severe accident at different speed limits. The plot demonstrates that the chance of a severe accident occurring generally increases for an increase in speed limit, other than at 70mph. The model is able to replicate the decreasing severity risk at 70mph of figure 1"}
 
 dat2 <- dat |>
   select(all_of(expl_vars2), accident_severity) |>
@@ -450,7 +456,7 @@ dat2 |>
   geom_point(size = 3, colour='dodgerblue3') +
   geom_errorbar(aes(ymin = lci, ymax = uci), width = 0.05, linewidth = 1, colour='dodgerblue3') +
   theme(legend.position = "none")+
-  labs(x = 'Speed Limit (MPH)', y = "Predicted probability")
+  labs(x = 'Speed Limit (mph)', y = "Predicted probability")
 ```
 
 
@@ -492,7 +498,7 @@ wrap_plots(pred_list[c(2,4,10, 5, 8:9,12, 14, 15)], nrow = 3, ncol = 3)
 #wrap_plots(pred_list[10:16], nrow = 3, ncol = 3)
 ```
 
-## Conclusions and discussion
+## Discussion
 
 We found that there were over 90,000 accidents reported in 2020, of which around fifth were classified as severe accidents. This high figure illustrates the potentially avoidable burden of death and injury caused by accidents on British roads. 
 
@@ -514,10 +520,7 @@ The limitations of this study must be noted. First, important factors such as dr
 
 ## Conclusion
 
-To conclude we can see that speed limit does in fact have a significant effect on accident severity. This is particularly the case in zones where the most vulnerable road users are to be found.
-
-
-___ do not seem to have much impact. There is (not) evidence of interactions between ___  and _____ . The driver’s gender does not appear to have any impact on accident severity. ________ does have an impact on accident severity. The data has been checked to verify whether there are any combinations where all the accidents were either severe or slight. 
+To conclude we can see that the speed limit does in fact have a significant effect on accident severity. This is particularly the case in zones where the most vulnerable road users are to be found. Whether or not a driver is under 25 years of age does not have an impact on acident severity. The driver’s gender does not appear to have any impact on accident severity. Road Surface Conditions do have an impact on accident severity. Unsurprisingly, roads are most dangerous between 11pm and 7am, when it is likely to be darkest. Lastly, single-carriageways (60 mph roads) are the most dangerous type of roads in the UK. Therefore, the government could look to reduce the severity of accidents by introducing additional safety measures on single-carriageways, such as speed cameras. 
 
 ## References
 
@@ -552,7 +555,7 @@ URL https://CRAN.R-project.org/doc/Rnews/
 
 \newpage
 
-## Technical Appendix
+## Appendix A - Technical Modelling Details 
 
 After creating a single dataset that combined all three datasets, the variables speed limit and maximum age of the vehicle were continuous variables and all other variables were converted to factor variables.  As part of exploratory data analysis, the numbers of accidents across various categories and proportions of missing data were assessed.   The number of accidents, casualty type and vehicle type were plotted against the outcome variable. We also reviewed contingency tables for each variable against the outcome to ensure that there were adequate numbers of observations in each cell for fitting a logistic regression model.  
 
@@ -566,7 +569,7 @@ Explanation on how the probabilities were calculated.
 
 \newpage
 
-## Appendix - Probability Table
+## Appendix B - Probability Table
 ```{r,results =TRUE}
 dat2 <- dat |> 
   select(all_of(expl_vars2), accident_severity) |> 
